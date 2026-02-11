@@ -4,7 +4,7 @@ import duckdb
 from datetime import datetime
 
 # Config
-DB_PATH = "redsox_25.duckdb"
+DB_PATH = "../../redsox_25.duckdb"
 TEAM_ID = 111
 BASE_URL = "https://statsapi.mlb.com/api/v1/schedule"
 HYDRATE = "team,lineups"
