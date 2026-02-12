@@ -8,7 +8,7 @@ DB_PATH = "../../redsox_25.duckdb"   # adjust to your path
 GAME_URL = "https://statsapi.mlb.com/api/v1/game/{pk}/withMetrics"
 TIMEOUT = 30
 SLEEP_SECONDS = 0.1
-USER_AGENT = "tenth-inning-script/1.0 (+you@example.com)"
+USER_AGENT = "tenth-inning-script/1.0 (ctaylr13@gmail.com)"
 
 def safe_get(d: Dict[str, Any], *path, default=None):
     cur = d
