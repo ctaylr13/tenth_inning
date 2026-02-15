@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@linaria/core": "^7.0.0",
+    "@linaria/react": "^7.0.1",
+    "@wyw-in-js/babel-preset": "^1.0.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
