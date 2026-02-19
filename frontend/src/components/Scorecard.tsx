@@ -1,16 +1,27 @@
-import SC_Header from "./SC_Header";
-import SC_Main from "./SC_Main";
-import SC_Bottom from "./SC_Bottom";
+import { styled } from "@linaria/react";
+
+const Box = styled.div`
+    display: flex;
+    flex-direction: row;
+`;
 const Scorecard = () => {
     return (
         <div>
             Scorecard
             {/* Top */}
-            <SC_Header />
+            <Box>
+                <div>Team Logo</div>
+                <div>Visiting Team</div>
+                <div>Manager</div>
+                <div>Uniforms</div>
+                <div>Umpires</div>
+                <div>Keeping Score by</div>
+                <div>First Pitch</div>
+            </Box>
             {/* Middle */}
-            <SC_Main />
+            <div>Middle</div>
             {/* Bottom */}
-            <SC_Bottom />
+            <div>Bottom</div>
         </div>
     );
 };

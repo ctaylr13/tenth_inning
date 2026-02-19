@@ -1,2 +1,4 @@
 frontend/package-lock.json
 *.duckdb
+
+**/node_modules/**
