@@ -1,5 +1,5 @@
 import Schedule from "./Schedule";
-import Scorecard from "./components/Scorecard";
+import ScorecardPage from "./components/ScorecardPage";
 import { useState } from "react";
 
 const App = () => {
@@ -19,7 +19,7 @@ const App = () => {
                     scorecard
                 </button>
             </div>
-            {currentAppPage === "schedule" ? <Schedule /> : <Scorecard />}
+            {currentAppPage === "schedule" ? <Schedule /> : <ScorecardPage />}
         </>
     );
 };
