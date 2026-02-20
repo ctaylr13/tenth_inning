@@ -13,7 +13,7 @@ const App = () => {
         <>
             <div>
                 <button onClick={() => selectPageOnClick("schedule")}>
-                    schedule
+                    watch schedule
                 </button>
                 <button onClick={() => selectPageOnClick("scorecard")}>
                     scorecard
