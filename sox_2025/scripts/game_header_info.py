@@ -1,11 +1,12 @@
 import duckdb
 
 DB_PATH = "../../redsox_25.duckdb"  # adjust path if needed
-OUT_TABLE = '"2025_game_info"'
+OUT_TABLE = 'main."2025_game_info"'
 
 SQL = f"""
 CREATE OR REPLACE TABLE {OUT_TABLE} AS
 SELECT
+  s."gamePk",
   s."officialDate",
   (SELECT t."team_name" FROM "teams_reference" t WHERE t."team_id" = s."away_team_id") AS away_team_name,
   (SELECT t."team_name" FROM "teams_reference" t WHERE t."team_id" = s."home_team_id") AS home_team_name,
