@@ -4,6 +4,31 @@ import duckdb
 
 DB_PATH = "../../redsox_25.duckdb"
 
+@task
+def get_new_games_game_pks():
+    with duckdb.connect(DB_PATH) as con:
+
+        # All scheduled games
+        all_games = con.execute("""
+            SELECT DISTINCT gamePk
+            FROM main."2025_schedule"
+        """).fetchall()
+
+        # Already ingested games
+        ingested = con.execute("""
+            SELECT DISTINCT game_pk
+            FROM main."2025_game_plate_appearance"
+        """).fetchall()
+
+    all_game_pks = {row[0] for row in all_games}
+    ingested_pks = {row[0] for row in ingested}
+
+    new_games = sorted(all_game_pks - ingested_pks)
+
+    print(f"{len(new_games)} games remaining to ingest.")
+
+    return new_games
+
 
 # ============================================================
 # ROW BUILDERS (PURE — NO DB SIDE EFFECTS)
