@@ -1,0 +1,276 @@
+{
+  "catcher_interf": {
+    "total_samples": 2,
+    "empty_credit_arrays": 3,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "c_catcher_interf"
+    ],
+    "credit_shape_valid": true
+  },
+  "caught_stealing_2b": {
+    "total_samples": 2,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "caught_stealing_3b": {
+    "total_samples": 1,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 1,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "caught_stealing_home": {
+    "total_samples": 1,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 1,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "double": {
+    "total_samples": 2,
+    "empty_credit_arrays": 2,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_fielded_ball"
+    ],
+    "credit_shape_valid": true
+  },
+  "double_play": {
+    "total_samples": 2,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 4,
+    "unique_credit_values": [
+      "f_assist",
+      "f_assist_of",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "field_error": {
+    "total_samples": 2,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_throwing_error"
+    ],
+    "credit_shape_valid": true
+  },
+  "field_out": {
+    "total_samples": 2,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "fielders_choice": {
+    "total_samples": 2,
+    "empty_credit_arrays": 2,
+    "non_empty_credit_arrays": 4,
+    "unique_credit_values": [
+      "f_assist",
+      "f_error_dropped_ball",
+      "f_fielded_ball",
+      "f_throwing_error"
+    ],
+    "credit_shape_valid": true
+  },
+  "fielders_choice_out": {
+    "total_samples": 2,
+    "empty_credit_arrays": 3,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "force_out": {
+    "total_samples": 2,
+    "empty_credit_arrays": 3,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "grounded_into_double_play": {
+    "total_samples": 2,
+    "empty_credit_arrays": 1,
+    "non_empty_credit_arrays": 4,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "hit_by_pitch": {
+    "total_samples": 2,
+    "empty_credit_arrays": 4,
+    "non_empty_credit_arrays": 0,
+    "unique_credit_values": [],
+    "credit_shape_valid": true
+  },
+  "home_run": {
+    "total_samples": 2,
+    "empty_credit_arrays": 3,
+    "non_empty_credit_arrays": 0,
+    "unique_credit_values": [],
+    "credit_shape_valid": true
+  },
+  "intent_walk": {
+    "total_samples": 2,
+    "empty_credit_arrays": 2,
+    "non_empty_credit_arrays": 0,
+    "unique_credit_values": [],
+    "credit_shape_valid": true
+  },
+  "other_out": {
+    "total_samples": 1,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 1,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "pickoff_1b": {
+    "total_samples": 2,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "pickoff_caught_stealing_2b": {
+    "total_samples": 2,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "pickoff_caught_stealing_3b": {
+    "total_samples": 2,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "pickoff_error_1b": {
+    "total_samples": 1,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout",
+      "f_throwing_error"
+    ],
+    "credit_shape_valid": true
+  },
+  "sac_bunt": {
+    "total_samples": 2,
+    "empty_credit_arrays": 4,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "sac_fly": {
+    "total_samples": 2,
+    "empty_credit_arrays": 3,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "single": {
+    "total_samples": 2,
+    "empty_credit_arrays": 1,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_fielded_ball"
+    ],
+    "credit_shape_valid": true
+  },
+  "stolen_base_2b": {
+    "total_samples": 1,
+    "empty_credit_arrays": 1,
+    "non_empty_credit_arrays": 1,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "strikeout": {
+    "total_samples": 2,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "strikeout_double_play": {
+    "total_samples": 2,
+    "empty_credit_arrays": 0,
+    "non_empty_credit_arrays": 4,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  },
+  "triple": {
+    "total_samples": 2,
+    "empty_credit_arrays": 1,
+    "non_empty_credit_arrays": 2,
+    "unique_credit_values": [
+      "f_fielded_ball"
+    ],
+    "credit_shape_valid": true
+  },
+  "walk": {
+    "total_samples": 2,
+    "empty_credit_arrays": 2,
+    "non_empty_credit_arrays": 0,
+    "unique_credit_values": [],
+    "credit_shape_valid": true
+  },
+  "wild_pitch": {
+    "total_samples": 1,
+    "empty_credit_arrays": 1,
+    "non_empty_credit_arrays": 1,
+    "unique_credit_values": [
+      "f_assist",
+      "f_putout"
+    ],
+    "credit_shape_valid": true
+  }
+}

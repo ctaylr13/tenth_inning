@@ -1,0 +1,3989 @@
+{
+  "catcher_interf": [
+    {
+      "game_pk": 776363,
+      "pa_id": 18,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Catcher Interference",
+            "eventType": "catcher_interf",
+            "movementReason": null,
+            "runner": {
+              "id": 700250,
+              "fullName": "Ben Rice",
+              "link": "/api/v1/people/700250"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 665966,
+                "link": "/api/v1/people/665966"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "c_catcher_interf"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Catcher Interference",
+            "eventType": "catcher_interf",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 592450,
+              "fullName": "Aaron Judge",
+              "link": "/api/v1/people/592450"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 777045,
+      "pa_id": 8,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Balk",
+            "eventType": "balk",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 547180,
+              "fullName": "Bryce Harper",
+              "link": "/api/v1/people/547180"
+            },
+            "responsiblePitcher": {
+              "id": 690916,
+              "link": "/api/v1/people/690916"
+            },
+            "isScoringEvent": true,
+            "rbi": false,
+            "earned": true,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Balk",
+            "eventType": "balk",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 592206,
+              "fullName": "Nick Castellanos",
+              "link": "/api/v1/people/592206"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Catcher Interference",
+            "eventType": "catcher_interf",
+            "movementReason": null,
+            "runner": {
+              "id": 669016,
+              "fullName": "Brandon Marsh",
+              "link": "/api/v1/people/669016"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 665966,
+                "link": "/api/v1/people/665966"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "c_catcher_interf"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "caught_stealing_2b": [
+    {
+      "game_pk": 776299,
+      "pa_id": 75,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Caught Stealing 2B",
+            "eventType": "caught_stealing_2b",
+            "movementReason": "r_caught_stealing_2b",
+            "runner": {
+              "id": 596115,
+              "fullName": "Trevor Story",
+              "link": "/api/v1/people/596115"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 669127,
+                "link": "/api/v1/people/669127"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 680869,
+                "link": "/api/v1/people/680869"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 776539,
+      "pa_id": 33,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Caught Stealing 2B",
+            "eventType": "caught_stealing_2b",
+            "movementReason": "r_caught_stealing_2b",
+            "runner": {
+              "id": 678882,
+              "fullName": "Ceddanne Rafaela",
+              "link": "/api/v1/people/678882"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 0
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 663698,
+                "link": "/api/v1/people/663698"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 669707,
+                "link": "/api/v1/people/669707"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "caught_stealing_3b": [
+    {
+      "game_pk": 777155,
+      "pa_id": 59,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": null,
+            "outBase": "3B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Caught Stealing 3B",
+            "eventType": "caught_stealing_3b",
+            "movementReason": "r_caught_stealing_3b",
+            "runner": {
+              "id": 666139,
+              "fullName": "Josh Lowe",
+              "link": "/api/v1/people/666139"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 665966,
+                "link": "/api/v1/people/665966"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 608324,
+                "link": "/api/v1/people/608324"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "caught_stealing_home": [
+    {
+      "game_pk": 777012,
+      "pa_id": 22,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": null,
+            "outBase": "4B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Caught Stealing Home",
+            "eventType": "caught_stealing_home",
+            "movementReason": "r_caught_stealing_home",
+            "runner": {
+              "id": 518692,
+              "fullName": "Freddie Freeman",
+              "link": "/api/v1/people/518692"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 6
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 657136,
+                "link": "/api/v1/people/657136"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 596115,
+                "link": "/api/v1/people/596115"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 657136,
+                "link": "/api/v1/people/657136"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "double": [
+    {
+      "game_pk": 776151,
+      "pa_id": 36,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Double",
+            "eventType": "double",
+            "movementReason": null,
+            "runner": {
+              "id": 680776,
+              "fullName": "Jarren Duran",
+              "link": "/api/v1/people/680776"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 678009,
+                "link": "/api/v1/people/678009"
+              },
+              "position": {
+                "code": "8",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "CF"
+              },
+              "credit": "f_fielded_ball"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Double",
+            "eventType": "double",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 686765,
+              "fullName": "Nick Sogard",
+              "link": "/api/v1/people/686765"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "3B",
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Double",
+            "eventType": "double",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 686765,
+              "fullName": "Nick Sogard",
+              "link": "/api/v1/people/686765"
+            },
+            "responsiblePitcher": {
+              "id": 663978,
+              "link": "/api/v1/people/663978"
+            },
+            "isScoringEvent": true,
+            "rbi": true,
+            "earned": true,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776151,
+      "pa_id": 23,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Double",
+            "eventType": "double",
+            "movementReason": null,
+            "runner": {
+              "id": 678882,
+              "fullName": "Ceddanne Rafaela",
+              "link": "/api/v1/people/678882"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 672761,
+                "link": "/api/v1/people/672761"
+              },
+              "position": {
+                "code": "9",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "RF"
+              },
+              "credit": "f_fielded_ball"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "double_play": [
+    {
+      "game_pk": 776363,
+      "pa_id": 62,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Double Play",
+            "eventType": "double_play",
+            "movementReason": null,
+            "runner": {
+              "id": 676609,
+              "fullName": "Jos\u00e9 Caballero",
+              "link": "/api/v1/people/676609"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 681987,
+                "link": "/api/v1/people/681987"
+              },
+              "position": {
+                "code": "9",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "RF"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": null,
+            "outBase": "4B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Double Play",
+            "eventType": "double_play",
+            "movementReason": "r_thrown_out",
+            "runner": {
+              "id": 665862,
+              "fullName": "Jazz Chisholm Jr.",
+              "link": "/api/v1/people/665862"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 681987,
+                "link": "/api/v1/people/681987"
+              },
+              "position": {
+                "code": "9",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "RF"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 681987,
+                "link": "/api/v1/people/681987"
+              },
+              "position": {
+                "code": "9",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "RF"
+              },
+              "credit": "f_assist_of"
+            },
+            {
+              "player": {
+                "id": 665966,
+                "link": "/api/v1/people/665966"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 776564,
+      "pa_id": 42,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Double Play",
+            "eventType": "double_play",
+            "movementReason": null,
+            "runner": {
+              "id": 663624,
+              "fullName": "Ryan Mountcastle",
+              "link": "/api/v1/people/663624"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 596115,
+                "link": "/api/v1/people/596115"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": null,
+            "outBase": "3B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Double Play",
+            "eventType": "double_play",
+            "movementReason": "r_doubled_off",
+            "runner": {
+              "id": 702616,
+              "fullName": "Jackson Holliday",
+              "link": "/api/v1/people/702616"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 596115,
+                "link": "/api/v1/people/596115"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 608324,
+                "link": "/api/v1/people/608324"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "field_error": [
+    {
+      "game_pk": 776186,
+      "pa_id": 38,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Field Error",
+            "eventType": "field_error",
+            "movementReason": null,
+            "runner": {
+              "id": 665489,
+              "fullName": "Vladimir Guerrero Jr.",
+              "link": "/api/v1/people/665489"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 596115,
+                "link": "/api/v1/people/596115"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_throwing_error"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 776217,
+      "pa_id": 3,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Field Error",
+            "eventType": "field_error",
+            "movementReason": null,
+            "runner": {
+              "id": 543807,
+              "fullName": "George Springer",
+              "link": "/api/v1/people/543807"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 596115,
+                "link": "/api/v1/people/596115"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_throwing_error"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "field_out": [
+    {
+      "game_pk": 776151,
+      "pa_id": 61,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Lineout",
+            "eventType": "field_out",
+            "movementReason": null,
+            "runner": {
+              "id": 663993,
+              "fullName": "Nathaniel Lowe",
+              "link": "/api/v1/people/663993"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 678009,
+                "link": "/api/v1/people/678009"
+              },
+              "position": {
+                "code": "8",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "CF"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 776151,
+      "pa_id": 51,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 1
+          },
+          "details": {
+            "event": "Flyout",
+            "eventType": "field_out",
+            "movementReason": null,
+            "runner": {
+              "id": 680776,
+              "fullName": "Jarren Duran",
+              "link": "/api/v1/people/680776"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 0
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 678009,
+                "link": "/api/v1/people/678009"
+              },
+              "position": {
+                "code": "8",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "CF"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fielders_choice": [
+    {
+      "game_pk": 776217,
+      "pa_id": 17,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Fielders Choice",
+            "eventType": "fielders_choice",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 664770,
+              "fullName": "Nathan Lukes",
+              "link": "/api/v1/people/664770"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Error",
+            "eventType": "error",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 665926,
+              "fullName": "Andr\u00e9s Gim\u00e9nez",
+              "link": "/api/v1/people/665926"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 663853,
+                "link": "/api/v1/people/663853"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 596115,
+                "link": "/api/v1/people/596115"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_error_dropped_ball"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Fielders Choice",
+            "eventType": "fielders_choice",
+            "movementReason": null,
+            "runner": {
+              "id": 676391,
+              "fullName": "Ernie Clement",
+              "link": "/api/v1/people/676391"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 663853,
+                "link": "/api/v1/people/663853"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_fielded_ball"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 776236,
+      "pa_id": 11,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Error",
+            "eventType": "error",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 691406,
+              "fullName": "Junior Caminero",
+              "link": "/api/v1/people/691406"
+            },
+            "responsiblePitcher": {
+              "id": 813349,
+              "link": "/api/v1/people/813349"
+            },
+            "isScoringEvent": true,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": true,
+            "playIndex": 5
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 608324,
+                "link": "/api/v1/people/608324"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_throwing_error"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Error",
+            "eventType": "error",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 666624,
+              "fullName": "Christopher Morel",
+              "link": "/api/v1/people/666624"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Fielders Choice",
+            "eventType": "fielders_choice",
+            "movementReason": null,
+            "runner": {
+              "id": 663743,
+              "fullName": "Nick Fortes",
+              "link": "/api/v1/people/663743"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 608324,
+                "link": "/api/v1/people/608324"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_fielded_ball"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fielders_choice_out": [
+    {
+      "game_pk": 776217,
+      "pa_id": 50,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": null,
+            "outBase": "4B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Fielders Choice Out",
+            "eventType": "fielders_choice_out",
+            "movementReason": "r_rundown",
+            "runner": {
+              "id": 678882,
+              "fullName": "Ceddanne Rafaela",
+              "link": "/api/v1/people/678882"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 665489,
+                "link": "/api/v1/people/665489"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 672386,
+                "link": "/api/v1/people/672386"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 665926,
+                "link": "/api/v1/people/665926"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Fielders Choice Out",
+            "eventType": "fielders_choice_out",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 663993,
+              "fullName": "Nathaniel Lowe",
+              "link": "/api/v1/people/663993"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Fielders Choice Out",
+            "eventType": "fielders_choice_out",
+            "movementReason": null,
+            "runner": {
+              "id": 677800,
+              "fullName": "Wilyer Abreu",
+              "link": "/api/v1/people/677800"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776379,
+      "pa_id": 33,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": null,
+            "outBase": "4B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Fielders Choice Out",
+            "eventType": "fielders_choice_out",
+            "movementReason": "r_runner_out",
+            "runner": {
+              "id": 657136,
+              "fullName": "Connor Wong",
+              "link": "/api/v1/people/657136"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 805779,
+                "link": "/api/v1/people/805779"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 680862,
+                "link": "/api/v1/people/680862"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Fielders Choice Out",
+            "eventType": "fielders_choice_out",
+            "movementReason": null,
+            "runner": {
+              "id": 608324,
+              "fullName": "Alex Bregman",
+              "link": "/api/v1/people/608324"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "force_out": [
+    {
+      "game_pk": 776151,
+      "pa_id": 27,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 1
+          },
+          "details": {
+            "event": "Forceout",
+            "eventType": "force_out",
+            "movementReason": "r_force_out",
+            "runner": {
+              "id": 681481,
+              "fullName": "Kerry Carpenter",
+              "link": "/api/v1/people/681481"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 666152,
+                "link": "/api/v1/people/666152"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Forceout",
+            "eventType": "force_out",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 669234,
+              "fullName": "Justyn-Henry Malloy",
+              "link": "/api/v1/people/669234"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Forceout",
+            "eventType": "force_out",
+            "movementReason": null,
+            "runner": {
+              "id": 672761,
+              "fullName": "Wenceel P\u00e9rez",
+              "link": "/api/v1/people/672761"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776157,
+      "pa_id": 44,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 1
+          },
+          "details": {
+            "event": "Forceout",
+            "eventType": "force_out",
+            "movementReason": "r_force_out",
+            "runner": {
+              "id": 608701,
+              "fullName": "Rob Refsnyder",
+              "link": "/api/v1/people/608701"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 679529,
+                "link": "/api/v1/people/679529"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 595879,
+                "link": "/api/v1/people/595879"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Forceout",
+            "eventType": "force_out",
+            "movementReason": null,
+            "runner": {
+              "id": 807799,
+              "fullName": "Masataka Yoshida",
+              "link": "/api/v1/people/807799"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "grounded_into_double_play": [
+    {
+      "game_pk": 776151,
+      "pa_id": 18,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 1
+          },
+          "details": {
+            "event": "Grounded Into DP",
+            "eventType": "grounded_into_double_play",
+            "movementReason": "r_force_out",
+            "runner": {
+              "id": 628451,
+              "fullName": "Andy Ib\u00e1\u00f1ez",
+              "link": "/api/v1/people/628451"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 0
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 686765,
+                "link": "/api/v1/people/686765"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 666152,
+                "link": "/api/v1/people/666152"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Grounded Into DP",
+            "eventType": "grounded_into_double_play",
+            "movementReason": null,
+            "runner": {
+              "id": 668670,
+              "fullName": "Jake Rogers",
+              "link": "/api/v1/people/668670"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 0
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 666152,
+                "link": "/api/v1/people/666152"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 663993,
+                "link": "/api/v1/people/663993"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 776151,
+      "pa_id": 56,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 1
+          },
+          "details": {
+            "event": "Grounded Into DP",
+            "eventType": "grounded_into_double_play",
+            "movementReason": "r_force_out",
+            "runner": {
+              "id": 628451,
+              "fullName": "Andy Ib\u00e1\u00f1ez",
+              "link": "/api/v1/people/628451"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 681987,
+                "link": "/api/v1/people/681987"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 666152,
+                "link": "/api/v1/people/666152"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Grounded Into DP",
+            "eventType": "grounded_into_double_play",
+            "movementReason": null,
+            "runner": {
+              "id": 668670,
+              "fullName": "Jake Rogers",
+              "link": "/api/v1/people/668670"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 666152,
+                "link": "/api/v1/people/666152"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 663993,
+                "link": "/api/v1/people/663993"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Grounded Into DP",
+            "eventType": "grounded_into_double_play",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 700242,
+              "fullName": "Trey Sweeney",
+              "link": "/api/v1/people/700242"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "hit_by_pitch": [
+    {
+      "game_pk": 776186,
+      "pa_id": 64,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Hit By Pitch",
+            "eventType": "hit_by_pitch",
+            "movementReason": null,
+            "runner": {
+              "id": 680776,
+              "fullName": "Jarren Duran",
+              "link": "/api/v1/people/680776"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776186,
+      "pa_id": 40,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Hit By Pitch",
+            "eventType": "hit_by_pitch",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 665489,
+              "fullName": "Vladimir Guerrero Jr.",
+              "link": "/api/v1/people/665489"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 8
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Hit By Pitch",
+            "eventType": "hit_by_pitch",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 680718,
+              "fullName": "Addison Barger",
+              "link": "/api/v1/people/680718"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 8
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Hit By Pitch",
+            "eventType": "hit_by_pitch",
+            "movementReason": null,
+            "runner": {
+              "id": 623993,
+              "fullName": "Anthony Santander",
+              "link": "/api/v1/people/623993"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 8
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "home_run": [
+    {
+      "game_pk": 776151,
+      "pa_id": 5,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Home Run",
+            "eventType": "home_run",
+            "movementReason": null,
+            "runner": {
+              "id": 807799,
+              "fullName": "Masataka Yoshida",
+              "link": "/api/v1/people/807799"
+            },
+            "responsiblePitcher": {
+              "id": 663978,
+              "link": "/api/v1/people/663978"
+            },
+            "isScoringEvent": true,
+            "rbi": true,
+            "earned": true,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776151,
+      "pa_id": 34,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Home Run",
+            "eventType": "home_run",
+            "movementReason": null,
+            "runner": {
+              "id": 666152,
+              "fullName": "David Hamilton",
+              "link": "/api/v1/people/666152"
+            },
+            "responsiblePitcher": {
+              "id": 663978,
+              "link": "/api/v1/people/663978"
+            },
+            "isScoringEvent": true,
+            "rbi": true,
+            "earned": true,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Home Run",
+            "eventType": "home_run",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 657136,
+              "fullName": "Connor Wong",
+              "link": "/api/v1/people/657136"
+            },
+            "responsiblePitcher": {
+              "id": 663978,
+              "link": "/api/v1/people/663978"
+            },
+            "isScoringEvent": true,
+            "rbi": true,
+            "earned": true,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "intent_walk": [
+    {
+      "game_pk": 776299,
+      "pa_id": 89,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Intent Walk",
+            "eventType": "intent_walk",
+            "movementReason": null,
+            "runner": {
+              "id": 663993,
+              "fullName": "Nathaniel Lowe",
+              "link": "/api/v1/people/663993"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776299,
+      "pa_id": 67,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Intent Walk",
+            "eventType": "intent_walk",
+            "movementReason": null,
+            "runner": {
+              "id": 663993,
+              "fullName": "Nathaniel Lowe",
+              "link": "/api/v1/people/663993"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "other_out": [
+    {
+      "game_pk": 776627,
+      "pa_id": 11,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Runner Out",
+            "eventType": "other_out",
+            "movementReason": "r_runner_out",
+            "runner": {
+              "id": 678882,
+              "fullName": "Ceddanne Rafaela",
+              "link": "/api/v1/people/678882"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 669224,
+                "link": "/api/v1/people/669224"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 683011,
+                "link": "/api/v1/people/683011"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pickoff_1b": [
+    {
+      "game_pk": 777310,
+      "pa_id": 31,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Pickoff 1B",
+            "eventType": "pickoff_1b",
+            "movementReason": "r_pickoff_1b",
+            "runner": {
+              "id": 623168,
+              "fullName": "Tyler Heineman",
+              "link": "/api/v1/people/623168"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 665966,
+                "link": "/api/v1/people/665966"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 663853,
+                "link": "/api/v1/people/663853"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 777345,
+      "pa_id": 24,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Pickoff 1B",
+            "eventType": "pickoff_1b",
+            "movementReason": "r_pickoff_1b",
+            "runner": {
+              "id": 665926,
+              "fullName": "Andr\u00e9s Gim\u00e9nez",
+              "link": "/api/v1/people/665926"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 657136,
+                "link": "/api/v1/people/657136"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 647351,
+                "link": "/api/v1/people/647351"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pickoff_caught_stealing_2b": [
+    {
+      "game_pk": 776310,
+      "pa_id": 67,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Pickoff Caught Stealing 2B",
+            "eventType": "pickoff_caught_stealing_2b",
+            "movementReason": "r_pickoff_caught_stealing_2b",
+            "runner": {
+              "id": 686765,
+              "fullName": "Nick Sogard",
+              "link": "/api/v1/people/686765"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 6
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 663687,
+                "link": "/api/v1/people/663687"
+              },
+              "position": {
+                "code": "1",
+                "name": "Pitcher",
+                "type": "Pitcher",
+                "abbreviation": "P"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 701762,
+                "link": "/api/v1/people/701762"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 805779,
+                "link": "/api/v1/people/805779"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 777395,
+      "pa_id": 54,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Pickoff Caught Stealing 2B",
+            "eventType": "pickoff_caught_stealing_2b",
+            "movementReason": "r_pickoff_caught_stealing_2b",
+            "runner": {
+              "id": 663853,
+              "fullName": "Romy Gonzalez",
+              "link": "/api/v1/people/663853"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 3
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 669062,
+                "link": "/api/v1/people/669062"
+              },
+              "position": {
+                "code": "1",
+                "name": "Pitcher",
+                "type": "Pitcher",
+                "abbreviation": "P"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 527038,
+                "link": "/api/v1/people/527038"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pickoff_caught_stealing_3b": [
+    {
+      "game_pk": 777500,
+      "pa_id": 21,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": null,
+            "outBase": "3B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Pickoff Caught Stealing 3B",
+            "eventType": "pickoff_caught_stealing_3b",
+            "movementReason": "r_pickoff_caught_stealing_3b",
+            "runner": {
+              "id": 700250,
+              "fullName": "Ben Rice",
+              "link": "/api/v1/people/700250"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 678394,
+                "link": "/api/v1/people/678394"
+              },
+              "position": {
+                "code": "1",
+                "name": "Pitcher",
+                "type": "Pitcher",
+                "abbreviation": "P"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 596115,
+                "link": "/api/v1/people/596115"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 647351,
+                "link": "/api/v1/people/647351"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 777516,
+      "pa_id": 54,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": null,
+            "outBase": "3B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Pickoff Caught Stealing 3B",
+            "eventType": "pickoff_caught_stealing_3b",
+            "movementReason": "r_pickoff_caught_stealing_3b",
+            "runner": {
+              "id": 691176,
+              "fullName": "Jasson Dom\u00ednguez",
+              "link": "/api/v1/people/691176"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 665966,
+                "link": "/api/v1/people/665966"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 596115,
+                "link": "/api/v1/people/596115"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 691785,
+                "link": "/api/v1/people/691785"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pickoff_error_1b": [
+    {
+      "game_pk": 776922,
+      "pa_id": 3,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Pickoff Error 1B",
+            "eventType": "pickoff_error_1b",
+            "movementReason": "r_pickoff_error_1b",
+            "runner": {
+              "id": 660821,
+              "fullName": "Jes\u00fas S\u00e1nchez",
+              "link": "/api/v1/people/660821"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 681867,
+                "link": "/api/v1/people/681867"
+              },
+              "position": {
+                "code": "1",
+                "name": "Pitcher",
+                "type": "Pitcher",
+                "abbreviation": "P"
+              },
+              "credit": "f_throwing_error"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "2B",
+            "end": null,
+            "outBase": "3B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Runner Out",
+            "eventType": "other_out",
+            "movementReason": "r_runner_out",
+            "runner": {
+              "id": 660821,
+              "fullName": "Jes\u00fas S\u00e1nchez",
+              "link": "/api/v1/people/660821"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 647351,
+                "link": "/api/v1/people/647351"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 608324,
+                "link": "/api/v1/people/608324"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sac_bunt": [
+    {
+      "game_pk": 776247,
+      "pa_id": 42,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Stolen Base 2B",
+            "eventType": "stolen_base_2b",
+            "movementReason": "r_stolen_base_2b",
+            "runner": {
+              "id": 663853,
+              "fullName": "Romy Gonzalez",
+              "link": "/api/v1/people/663853"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 1
+          },
+          "details": {
+            "event": "Sac Bunt",
+            "eventType": "sac_bunt",
+            "movementReason": null,
+            "runner": {
+              "id": 681987,
+              "fullName": "Nate Eaton",
+              "link": "/api/v1/people/681987"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 605288,
+                "link": "/api/v1/people/605288"
+              },
+              "position": {
+                "code": "1",
+                "name": "Pitcher",
+                "type": "Pitcher",
+                "abbreviation": "P"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 650490,
+                "link": "/api/v1/people/650490"
+              },
+              "position": {
+                "code": "3",
+                "name": "First Base",
+                "type": "Infielder",
+                "abbreviation": "1B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Sac Bunt",
+            "eventType": "sac_bunt",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 663853,
+              "fullName": "Romy Gonzalez",
+              "link": "/api/v1/people/663853"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776299,
+      "pa_id": 90,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 1
+          },
+          "details": {
+            "event": "Sac Bunt",
+            "eventType": "sac_bunt",
+            "movementReason": null,
+            "runner": {
+              "id": 665966,
+              "fullName": "Carlos Narv\u00e1ez",
+              "link": "/api/v1/people/665966"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 687231,
+                "link": "/api/v1/people/687231"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 680869,
+                "link": "/api/v1/people/680869"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Sac Bunt",
+            "eventType": "sac_bunt",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 681987,
+              "fullName": "Nate Eaton",
+              "link": "/api/v1/people/681987"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Sac Bunt",
+            "eventType": "sac_bunt",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 663993,
+              "fullName": "Nathaniel Lowe",
+              "link": "/api/v1/people/663993"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "sac_fly": [
+    {
+      "game_pk": 776181,
+      "pa_id": 57,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Sac Fly",
+            "eventType": "sac_fly",
+            "movementReason": null,
+            "runner": {
+              "id": 663993,
+              "fullName": "Nathaniel Lowe",
+              "link": "/api/v1/people/663993"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 678009,
+                "link": "/api/v1/people/678009"
+              },
+              "position": {
+                "code": "8",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "CF"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Sac Fly",
+            "eventType": "sac_fly",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 807799,
+              "fullName": "Masataka Yoshida",
+              "link": "/api/v1/people/807799"
+            },
+            "responsiblePitcher": {
+              "id": 663554,
+              "link": "/api/v1/people/663554"
+            },
+            "isScoringEvent": true,
+            "rbi": true,
+            "earned": true,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776236,
+      "pa_id": 71,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Sac Fly",
+            "eventType": "sac_fly",
+            "movementReason": null,
+            "runner": {
+              "id": 663968,
+              "fullName": "Jake Mangum",
+              "link": "/api/v1/people/663968"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 678882,
+                "link": "/api/v1/people/678882"
+              },
+              "position": {
+                "code": "8",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "CF"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "2B",
+            "start": "2B",
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Sac Fly",
+            "eventType": "sac_fly",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 666624,
+              "fullName": "Christopher Morel",
+              "link": "/api/v1/people/666624"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Sac Fly",
+            "eventType": "sac_fly",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 664040,
+              "fullName": "Brandon Lowe",
+              "link": "/api/v1/people/664040"
+            },
+            "responsiblePitcher": {
+              "id": 801139,
+              "link": "/api/v1/people/801139"
+            },
+            "isScoringEvent": true,
+            "rbi": true,
+            "earned": true,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "single": [
+    {
+      "game_pk": 776151,
+      "pa_id": 25,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Single",
+            "eventType": "single",
+            "movementReason": null,
+            "runner": {
+              "id": 669234,
+              "fullName": "Justyn-Henry Malloy",
+              "link": "/api/v1/people/669234"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 680776,
+                "link": "/api/v1/people/680776"
+              },
+              "position": {
+                "code": "7",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "LF"
+              },
+              "credit": "f_fielded_ball"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 776151,
+      "pa_id": 55,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Single",
+            "eventType": "single",
+            "movementReason": null,
+            "runner": {
+              "id": 628451,
+              "fullName": "Andy Ib\u00e1\u00f1ez",
+              "link": "/api/v1/people/628451"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 678882,
+                "link": "/api/v1/people/678882"
+              },
+              "position": {
+                "code": "8",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "CF"
+              },
+              "credit": "f_fielded_ball"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Single",
+            "eventType": "single",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 700242,
+              "fullName": "Trey Sweeney",
+              "link": "/api/v1/people/700242"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "stolen_base_2b": [
+    {
+      "game_pk": 777876,
+      "pa_id": 38,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "2B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Stolen Base 2B",
+            "eventType": "stolen_base_2b",
+            "movementReason": "r_stolen_base_2b",
+            "runner": {
+              "id": 666152,
+              "fullName": "David Hamilton",
+              "link": "/api/v1/people/666152"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "2B",
+            "end": null,
+            "outBase": "3B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Runner Out",
+            "eventType": "other_out",
+            "movementReason": "r_runner_out",
+            "runner": {
+              "id": 666152,
+              "fullName": "David Hamilton",
+              "link": "/api/v1/people/666152"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 669397,
+                "link": "/api/v1/people/669397"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 663586,
+                "link": "/api/v1/people/663586"
+              },
+              "position": {
+                "code": "5",
+                "name": "Third Base",
+                "type": "Infielder",
+                "abbreviation": "3B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "strikeout": [
+    {
+      "game_pk": 776151,
+      "pa_id": 72,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Strikeout",
+            "eventType": "strikeout",
+            "movementReason": null,
+            "runner": {
+              "id": 668670,
+              "fullName": "Jake Rogers",
+              "link": "/api/v1/people/668670"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 657136,
+                "link": "/api/v1/people/657136"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 776151,
+      "pa_id": 1,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Strikeout",
+            "eventType": "strikeout",
+            "movementReason": null,
+            "runner": {
+              "id": 656716,
+              "fullName": "Zach McKinstry",
+              "link": "/api/v1/people/656716"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 657136,
+                "link": "/api/v1/people/657136"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "strikeout_double_play": [
+    {
+      "game_pk": 776517,
+      "pa_id": 59,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 1
+          },
+          "details": {
+            "event": "Strikeout Double Play",
+            "eventType": "strikeout_double_play",
+            "movementReason": null,
+            "runner": {
+              "id": 596115,
+              "fullName": "Trevor Story",
+              "link": "/api/v1/people/596115"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 680779,
+                "link": "/api/v1/people/680779"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Caught Stealing 2B",
+            "eventType": "caught_stealing_2b",
+            "movementReason": "r_caught_stealing_2b",
+            "runner": {
+              "id": 680776,
+              "fullName": "Jarren Duran",
+              "link": "/api/v1/people/680776"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 5
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 680779,
+                "link": "/api/v1/people/680779"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 693304,
+                "link": "/api/v1/people/693304"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "game_pk": 777012,
+      "pa_id": 60,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": null,
+            "outBase": "1B",
+            "isOut": true,
+            "outNumber": 1
+          },
+          "details": {
+            "event": "Strikeout Double Play",
+            "eventType": "strikeout_double_play",
+            "movementReason": null,
+            "runner": {
+              "id": 624424,
+              "fullName": "Michael Conforto",
+              "link": "/api/v1/people/624424"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 6
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 657136,
+                "link": "/api/v1/people/657136"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 2
+          },
+          "details": {
+            "event": "Caught Stealing 2B",
+            "eventType": "caught_stealing_2b",
+            "movementReason": "r_caught_stealing_2b",
+            "runner": {
+              "id": 681624,
+              "fullName": "Andy Pages",
+              "link": "/api/v1/people/681624"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 6
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 657136,
+                "link": "/api/v1/people/657136"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 596115,
+                "link": "/api/v1/people/596115"
+              },
+              "position": {
+                "code": "6",
+                "name": "Shortstop",
+                "type": "Infielder",
+                "abbreviation": "SS"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "triple": [
+    {
+      "game_pk": 776181,
+      "pa_id": 72,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Triple",
+            "eventType": "triple",
+            "movementReason": null,
+            "runner": {
+              "id": 678882,
+              "fullName": "Ceddanne Rafaela",
+              "link": "/api/v1/people/678882"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 672761,
+                "link": "/api/v1/people/672761"
+              },
+              "position": {
+                "code": "9",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "RF"
+              },
+              "credit": "f_fielded_ball"
+            }
+          ]
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Triple",
+            "eventType": "triple",
+            "movementReason": "r_adv_force",
+            "runner": {
+              "id": 663853,
+              "fullName": "Romy Gonzalez",
+              "link": "/api/v1/people/663853"
+            },
+            "responsiblePitcher": {
+              "id": 592454,
+              "link": "/api/v1/people/592454"
+            },
+            "isScoringEvent": true,
+            "rbi": true,
+            "earned": true,
+            "teamUnearned": false,
+            "playIndex": 1
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776186,
+      "pa_id": 4,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "3B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Triple",
+            "eventType": "triple",
+            "movementReason": null,
+            "runner": {
+              "id": 664770,
+              "fullName": "Nathan Lukes",
+              "link": "/api/v1/people/664770"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 6
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 608701,
+                "link": "/api/v1/people/608701"
+              },
+              "position": {
+                "code": "9",
+                "name": "Outfielder",
+                "type": "Outfielder",
+                "abbreviation": "RF"
+              },
+              "credit": "f_fielded_ball"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "walk": [
+    {
+      "game_pk": 776151,
+      "pa_id": 14,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Walk",
+            "eventType": "walk",
+            "movementReason": null,
+            "runner": {
+              "id": 666152,
+              "fullName": "David Hamilton",
+              "link": "/api/v1/people/666152"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 4
+          },
+          "credits": []
+        }
+      ]
+    },
+    {
+      "game_pk": 776151,
+      "pa_id": 70,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": null,
+            "start": null,
+            "end": "1B",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Walk",
+            "eventType": "walk",
+            "movementReason": null,
+            "runner": {
+              "id": 700242,
+              "fullName": "Trey Sweeney",
+              "link": "/api/v1/people/700242"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 7
+          },
+          "credits": []
+        }
+      ]
+    }
+  ],
+  "wild_pitch": [
+    {
+      "game_pk": 778037,
+      "pa_id": 4,
+      "runners_credits": [
+        {
+          "movement": {
+            "originBase": "3B",
+            "start": "3B",
+            "end": "score",
+            "outBase": null,
+            "isOut": false,
+            "outNumber": null
+          },
+          "details": {
+            "event": "Wild Pitch",
+            "eventType": "wild_pitch",
+            "movementReason": "r_adv_play",
+            "runner": {
+              "id": 694671,
+              "fullName": "Wyatt Langford",
+              "link": "/api/v1/people/694671"
+            },
+            "responsiblePitcher": {
+              "id": 608337,
+              "link": "/api/v1/people/608337"
+            },
+            "isScoringEvent": true,
+            "rbi": false,
+            "earned": true,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": []
+        },
+        {
+          "movement": {
+            "originBase": "1B",
+            "start": "1B",
+            "end": null,
+            "outBase": "2B",
+            "isOut": true,
+            "outNumber": 3
+          },
+          "details": {
+            "event": "Runner Out",
+            "eventType": "other_out",
+            "movementReason": "r_runner_out",
+            "runner": {
+              "id": 592626,
+              "fullName": "Joc Pederson",
+              "link": "/api/v1/people/592626"
+            },
+            "responsiblePitcher": null,
+            "isScoringEvent": false,
+            "rbi": false,
+            "earned": false,
+            "teamUnearned": false,
+            "playIndex": 2
+          },
+          "credits": [
+            {
+              "player": {
+                "id": 665966,
+                "link": "/api/v1/people/665966"
+              },
+              "position": {
+                "code": "2",
+                "name": "Catcher",
+                "type": "Catcher",
+                "abbreviation": "C"
+              },
+              "credit": "f_assist"
+            },
+            {
+              "player": {
+                "id": 692225,
+                "link": "/api/v1/people/692225"
+              },
+              "position": {
+                "code": "4",
+                "name": "Second Base",
+                "type": "Infielder",
+                "abbreviation": "2B"
+              },
+              "credit": "f_putout"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
