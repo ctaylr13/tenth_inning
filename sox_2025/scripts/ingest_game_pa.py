@@ -1,6 +1,7 @@
 from prefect import flow, task
 import requests
 import duckdb
+from prefect.task_runners import ConcurrentTaskRunner
 
 DB_PATH = "../../redsox_25.duckdb"
 
@@ -29,6 +30,28 @@ def get_new_games_game_pks():
 
     return new_games
 
+@task
+def get_new_games_game_pks():
+    with duckdb.connect(DB_PATH) as con:
+
+        all_games = con.execute("""
+            SELECT DISTINCT gamePk
+            FROM main."2025_schedule"
+        """).fetchall()
+
+        ingested = con.execute("""
+            SELECT DISTINCT game_pk
+            FROM runner_defensive_credits
+        """).fetchall()
+
+    all_game_pks = {row[0] for row in all_games}
+    ingested_pks = {row[0] for row in ingested}
+
+    new_games = sorted(all_game_pks - ingested_pks)
+
+    print(f"{len(new_games)} games missing defensive credits.")
+
+    return new_games
 
 # ============================================================
 # ROW BUILDERS (PURE — NO DB SIDE EFFECTS)
@@ -227,12 +250,38 @@ def build_pitch_call_rows(plays, game_pk):
     return rows
 
 
+@task
+def build_runner_credit_rows(plays, game_pk):
+    rows = []
+
+    for play in plays:
+
+        pa_id = play["about"]["atBatIndex"]
+        event_type = play["result"]["eventType"]
+
+        for runner in play.get("runners", []):
+
+            runner_id = runner.get("details", {}).get("runner", {}).get("id")
+
+            for credit in runner.get("credits", []):
+
+                rows.append((
+                    game_pk,
+                    pa_id,
+                    runner_id,
+                    event_type,
+                    credit.get("credit"),
+                    credit.get("player", {}).get("id"),
+                    credit.get("position", {}).get("code"),
+                ))
+
+    return rows
 # ============================================================
 # SINGLE DB WRITER
 # ============================================================
 
 @task
-def write_game_to_db(game_pk, pa_rows, pitch_rows, runner_rows, pitch_call_rows):
+def write_game_to_db(game_pk, pa_rows, pitch_rows, runner_rows, pitch_call_rows, runner_credit_rows):
 
     with duckdb.connect(DB_PATH) as con:
         con.execute("BEGIN")
@@ -247,12 +296,25 @@ def write_game_to_db(game_pk, pa_rows, pitch_rows, runner_rows, pitch_call_rows)
             PRIMARY KEY (game_pk, pa_id, pitch_number)
         );
         """)
+        con.execute("""
+        CREATE TABLE IF NOT EXISTS runner_defensive_credits (
+            game_pk        INTEGER NOT NULL,
+            pa_id          INTEGER NOT NULL,
+            runner_id      INTEGER,
+            event_type     VARCHAR,
+            credit_type    VARCHAR,
+            player_id      INTEGER,
+            position_code  VARCHAR,
+            PRIMARY KEY (game_pk, pa_id, runner_id, credit_type, player_id)
+        );
+        """)
 
         # Safe re-run deletes
         con.execute("DELETE FROM pa_plate_events WHERE game_pk = ?", (game_pk,))
         con.execute("DELETE FROM main.\"2025_game_plate_appearance\" WHERE game_pk = ?", (game_pk,))
         con.execute("DELETE FROM main.\"2025_plate_appearance_movement_details\" WHERE game_pk = ?", (game_pk,))
         con.execute("DELETE FROM pitches WHERE game_pk = ?", (game_pk,))
+        con.execute("DELETE FROM runner_defensive_credits WHERE game_pk = ?", (game_pk,))
 
         # Insert main tables
         con.executemany("""
@@ -274,7 +336,10 @@ def write_game_to_db(game_pk, pa_rows, pitch_rows, runner_rows, pitch_call_rows)
             INSERT OR IGNORE INTO pitches
             VALUES (?, ?, ?, ?)
         """, pitch_call_rows)
-
+        con.executemany("""
+            INSERT INTO runner_defensive_credits
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, runner_credit_rows)
         con.execute("COMMIT")
 
     print(f"Game {game_pk} written successfully.")
@@ -284,7 +349,7 @@ def write_game_to_db(game_pk, pa_rows, pitch_rows, runner_rows, pitch_call_rows)
 # FLOW
 # ============================================================
 
-@flow(name="game_plate_appearance_ingestion", flow_run_name="game-{game_pk}")
+@task(name="game_plate_appearance_ingestion", task_run_name="game-{game_pk}")
 def ingest_game(game_pk: int):
 
     url = f"https://statsapi.mlb.com/api/v1/game/{game_pk}/withMetrics"
@@ -298,15 +363,34 @@ def ingest_game(game_pk: int):
     pitch_rows = build_pitch_rows(plays, game_pk, home_team_id, away_team_id)
     runner_rows = build_runner_rows(plays, game_pk, home_team_id, away_team_id)
     pitch_call_rows = build_pitch_call_rows(plays, game_pk)
+    runner_credit_rows = build_runner_credit_rows(plays, game_pk)
 
     write_game_to_db(
         game_pk,
         pa_rows,
         pitch_rows,
         runner_rows,
-        pitch_call_rows
+        pitch_call_rows,
+        runner_credit_rows
     )
 
 
+@flow(name="game_plate_appearance_ingestion", 
+      flow_run_name="2025_season_pa",
+      task_runner=ConcurrentTaskRunner(max_workers=5))
+def ingest_season():
+    # missing_game_pks = get_new_games_game_pks()
+    missing_game_pks = get_all_games()
+    missing_game_pks = missing_game_pks[:10]
+    futures = []
+
+    for game_pk in missing_game_pks:
+        future = ingest_game.submit(game_pk)
+        futures.append(future)
+
+    # Wait for all to finish
+    for f in futures:
+        f.result()
+
 if __name__ == "__main__":
-    ingest_game(778550)
+    ingest_season()
