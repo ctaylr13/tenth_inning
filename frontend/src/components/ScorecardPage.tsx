@@ -2,6 +2,7 @@ import { styled } from "@linaria/react";
 import Scorecard from "./Scorecard/Scorecard";
 import Pitcher from "./Scorecard/Pitcher";
 import Defense from "./Scorecard/Defense";
+import Scoreboard from "./Scorecard/Scoreboard";
 
 const ScorecardHeader = styled.div`
     display: flex;
@@ -68,6 +69,7 @@ const ScorecardPage = () => {
             <BottomRow>
                 <Defense />
                 <Pitcher />
+                <Scoreboard />
             </BottomRow>
         </div>
     );
