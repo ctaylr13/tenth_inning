@@ -33,6 +33,7 @@ const BottomRow = styled.div`
     display: flex;
     flex-direction: row;
     padding-top: 1rem;
+    gap: 1rem;
 `;
 
 const ScorecardPage = () => {
