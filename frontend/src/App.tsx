@@ -1,9 +1,10 @@
 import Schedule from "./Schedule";
 import ScorecardPage from "./components/ScorecardPage";
+import NewSchedule from "./NewSchedule";
 import { useState } from "react";
 
 const App = () => {
-    const [currentAppPage, setCurrentAppPage] = useState("scorecard");
+    const [currentAppPage, setCurrentAppPage] = useState("newSchedule");
 
     const selectPageOnClick = (selectedPage: string) => {
         setCurrentAppPage(selectedPage);
@@ -18,8 +19,13 @@ const App = () => {
                 <button onClick={() => selectPageOnClick("scorecard")}>
                     scorecard
                 </button>
+                <button onClick={() => selectPageOnClick("newSchedule")}>
+                    updated schedule
+                </button>
             </div>
-            {currentAppPage === "schedule" ? <Schedule /> : <ScorecardPage />}
+            {currentAppPage === "schedule" && <Schedule />}
+            {currentAppPage === "scorecard" && <ScorecardPage />}
+            {currentAppPage === "newSchedule" && <NewSchedule />}
         </>
     );
 };
