@@ -4,7 +4,7 @@ import NewSchedule from "./NewSchedule";
 import { useState } from "react";
 
 const App = () => {
-    const [currentAppPage, setCurrentAppPage] = useState("scorecard");
+    const [currentAppPage, setCurrentAppPage] = useState("newSchedule");
 
     const selectPageOnClick = (selectedPage: string) => {
         setCurrentAppPage(selectedPage);

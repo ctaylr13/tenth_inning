@@ -4,15 +4,22 @@ interface DayComponentProps {
     date: number;
     opponent: string;
     time: string;
+    location: "home" | "away";
 }
 
-const DayCell = styled.div`
+interface DayCellProps {
+    location: "home" | "away";
+}
+
+const DayCell = styled.div<DayCellProps>`
     display: flex;
     flex-direction: column;
     border: 1px solid black;
     padding: 0.5rem;
     gap: 0.5rem;
-    background-color: #094f4f;
+
+    background-color: ${(props) =>
+        props.location === "home" ? "red" : "lightgray"};
 `;
 
 const DayHeader = styled.div`
@@ -28,10 +35,12 @@ const DayContent = styled.div`
 `;
 
 const DayComponent: React.FC<DayComponentProps> = (props) => {
-    const { date, opponent, time } = props;
+    const { date, opponent, time, location } = props;
+
     return (
-        <DayCell>
+        <DayCell location={location}>
             <DayHeader>{date}</DayHeader>
+
             <DayContent>
                 <div>{opponent}</div>
                 <div>{time}</div>
