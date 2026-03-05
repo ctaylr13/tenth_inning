@@ -4,11 +4,11 @@ interface DayComponentProps {
     date: number;
     opponent: string;
     time: string;
-    location: "home" | "away";
+    location: string;
 }
 
 interface DayCellProps {
-    location: "home" | "away";
+    location: string;
 }
 
 const DayCell = styled.div<DayCellProps>`
@@ -17,21 +17,23 @@ const DayCell = styled.div<DayCellProps>`
     border: 1px solid black;
     padding: 0.5rem;
     gap: 0.5rem;
-
+    font-family: Impact;
+    color: ${(props) => (props.location === "home" ? "white" : "black")};
     background-color: ${(props) =>
-        props.location === "home" ? "red" : "lightgray"};
+        props.location === "home" ? "darkred" : "lightgray"};
 `;
 
 const DayHeader = styled.div`
     display: flex;
     justify-content: flex-end;
-    background-color: lightgray;
 `;
 
 const DayContent = styled.div`
     display: flex;
     flex-direction: column;
-    background-color: aliceblue;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
 `;
 
 const DayComponent: React.FC<DayComponentProps> = (props) => {
@@ -40,7 +42,6 @@ const DayComponent: React.FC<DayComponentProps> = (props) => {
     return (
         <DayCell location={location}>
             <DayHeader>{date}</DayHeader>
-
             <DayContent>
                 <div>{opponent}</div>
                 <div>{time}</div>

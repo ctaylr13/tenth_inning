@@ -40,13 +40,11 @@ const MonthComponent: React.FC<MonthComponentProps> = ({
     return (
         <Box>
             <MonthTitle>{title}</MonthTitle>
-
             <DaysHeaderRow>
                 {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((d) => (
                     <DayHeader key={d} day={d} />
                 ))}
             </DaysHeaderRow>
-
             <DaysGrid>
                 {days.map((day) => (
                     <GameComponent

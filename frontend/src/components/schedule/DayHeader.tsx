@@ -5,6 +5,7 @@ const Box = styled.div`
     display: flex;
     flex-direction: column;
     background-color: #1b0464;
+    align-items: center;
     color: white;
     font-family: Impact;
     padding: 0.5rem;
