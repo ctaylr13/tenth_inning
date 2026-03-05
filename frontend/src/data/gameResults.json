@@ -1,0 +1,200 @@
+{
+    "boxScore": [
+        {
+            "teamId": 111,
+            "runs": 5,
+            "hits": 6,
+            "errors": 0,
+            "leftOnBase": 4,
+            "rbis": 5,
+            "atBats": 30
+        },
+        {
+            "teamId": 140,
+            "runs": 2,
+            "hits": 7,
+            "errors": 0,
+            "leftOnBase": 3,
+            "rbis": 2,
+            "atBats": 28
+        }
+    ],
+    "inningTotal": [
+        {
+            "teamId": "140",
+            "inning": 1,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "111",
+            "inning": 1,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "140",
+            "inning": 2,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "111",
+            "inning": 2,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "140",
+            "inning": 3,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "111",
+            "inning": 3,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "140",
+            "inning": 4,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "111",
+            "inning": 4,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "140",
+            "inning": 5,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "111",
+            "inning": 5,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "140",
+            "inning": 6,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "111",
+            "inning": 6,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "140",
+            "inning": 7,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "111",
+            "inning": 7,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "140",
+            "inning": 8,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "111",
+            "inning": 8,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "140",
+            "inning": 9,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        },
+        {
+            "teamId": "111",
+            "inning": 9,
+            "runs": 0,
+            "hits": 0,
+            "errors": 0,
+            "leftOnBase": 0,
+            "stolenBases": 0
+        }
+    ],
+    "pitchingDecision": [
+        {
+            "name": "Chapman",
+            "status": "Winning"
+        },
+        {
+            "name": "Jackson",
+            "status": "Losing"
+        },
+        {
+            "name": "Slaten",
+            "status": "Save"
+        }
+    ]
+}

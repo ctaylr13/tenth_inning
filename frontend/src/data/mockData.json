@@ -1,0 +1,205 @@
+{
+    "gamePk": 77853,
+    "gameInfo": {
+        "venue": "Globe Life Field",
+        "date": "2025-03-27",
+        "firstPitch": "7:05 PM",
+        "finalPitch": "10:15 PM",
+        "attendance": 40000
+    },
+    "pitchingDecision": [
+        {
+            "name": "Chapman",
+            "status": "Winning"
+        },
+        {
+            "name": "Jackson",
+            "status": "Losing"
+        },
+        {
+            "name": "Slaten",
+            "status": "Save"
+        }
+    ],
+    "boxScore": [
+        {
+            "teamId": 111,
+            "runs": 5,
+            "hits": 7,
+            "errors": 0,
+            "leftOnBase": 4
+        },
+        {
+            "teamId": 140,
+            "runs": 2,
+            "hits": 7,
+            "errors": 0,
+            "leftOnBase": 0
+        }
+    ],
+    "officials": [
+        {
+            "officialType": "Home Plate Umpire",
+            "officialName": "T. Tichenor"
+        },
+        {
+            "officialType": "1B Umpire",
+            "officialName": "J. West"
+        },
+        {
+            "officialType": "2B Umpire",
+            "officialName": "A. Hamari"
+        },
+        {
+            "officialType": "3B Umpire",
+            "officialName": "N. Ceja"
+        }
+    ],
+    "lineScore": [
+        {
+            "teamId": 111,
+            "inning1": 0,
+            "inning2": 0,
+            "inning3": 0,
+            "inning4": 0,
+            "inning5": 2,
+            "inning6": 0,
+            "inning7": 1,
+            "inning8": 0,
+            "inning9": 2
+        },
+        {
+            "teamId": 140,
+            "inning1": 0,
+            "inning2": 0,
+            "inning3": 1,
+            "inning4": 0,
+            "inning5": 0,
+            "inning6": 1,
+            "inning7": 0,
+            "inning8": 0,
+            "inning9": 0
+        }
+    ],
+    "teamInfo": [
+        {
+            "teamId": 111,
+            "teamName": "Boston Red Sox",
+            "league": "AL",
+            "division": "East",
+            "manager": "Alex Cora",
+            "uniform": "Road grey",
+            "isHome": false,
+            "lineup": [
+                {
+                    "position": "7",
+                    "battingOrder": 100,
+                    "player": {
+                        "first": "Jarren",
+                        "last": "Duran",
+                        "number": 16,
+                        "throws": "L",
+                        "bats": "L"
+                    }
+                },
+                {
+                    "position": "DH",
+                    "battingOrder": 200,
+                    "player": {
+                        "first": "Rafael",
+                        "last": "Devers",
+                        "number": 11,
+                        "throws": "L",
+                        "bats": "L"
+                    }
+                },
+                {
+                    "position": "5",
+                    "battingOrder": 300,
+                    "player": {
+                        "first": "Alex",
+                        "last": "Bregman",
+                        "number": 2,
+                        "throws": "L",
+                        "bats": "R"
+                    }
+                },
+                {
+                    "position": "3",
+                    "battingOrder": 400,
+                    "player": {
+                        "first": "Triston",
+                        "last": "Casas",
+                        "number": 36,
+                        "throws": "L",
+                        "bats": "L"
+                    }
+                },
+                {
+                    "position": "6",
+                    "battingOrder": 500,
+                    "player": {
+                        "first": "Trevor",
+                        "last": "Story",
+                        "number": 10,
+                        "throws": "L",
+                        "bats": "R"
+                    }
+                },
+                {
+                    "position": "4",
+                    "battingOrder": 600,
+                    "player": {
+                        "first": "Kriston",
+                        "last": "Campbell",
+                        "number": 28,
+                        "throws": "L",
+                        "bats": "R"
+                    }
+                },
+                {
+                    "position": "9",
+                    "battingOrder": 700,
+                    "player": {
+                        "first": "Wilyar",
+                        "last": "Abreu",
+                        "number": 52,
+                        "throws": "L",
+                        "bats": "L"
+                    }
+                },
+                {
+                    "position": "2",
+                    "battingOrder": 800,
+                    "player": {
+                        "first": "Connor",
+                        "last": "Wong",
+                        "number": 12,
+                        "throws": "L",
+                        "bats": "R"
+                    }
+                },
+                {
+                    "position": "8",
+                    "battingOrder": 900,
+                    "player": {
+                        "first": "Ceddane",
+                        "last": "Rafaela",
+                        "number": 3,
+                        "throws": "L",
+                        "bats": "L"
+                    }
+                }
+            ]
+        },
+        {
+            "teamId": 140,
+            "teamName": "Texas Rangers",
+            "league": "AL",
+            "division": "West",
+            "manager": "Bruce Buchy",
+            "uniform": "White Home",
+            "isHome": true
+        }
+    ]
+}
