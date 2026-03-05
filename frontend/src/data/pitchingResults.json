@@ -1,0 +1,52 @@
+{
+    "results": [
+        {
+            "playerId": 1,
+            "teamId": 140,
+            "inningsPitched": 6,
+            "pitches": 100,
+            "battersFaced": 20,
+            "hits": 5,
+            "runs": 2,
+            "earnedRuns": 2,
+            "baseOnBalls": 2,
+            "strikeOuts": 8
+        },
+        {
+            "playerId": 2,
+            "teamId": 111,
+            "inningsPitched": 6,
+            "pitches": 100,
+            "battersFaced": 20,
+            "hits": 5,
+            "runs": 2,
+            "earnedRuns": 2,
+            "baseOnBalls": 2,
+            "strikeOuts": 8
+        },
+        {
+            "playerId": 3,
+            "teamId": 140,
+            "inningsPitched": 0,
+            "pitches": 0,
+            "battersFaced": 0,
+            "hits": 0,
+            "runs": 0,
+            "earnedRuns": 0,
+            "baseOnBalls": 0,
+            "strikeOuts": 0
+        },
+        {
+            "playerId": 4,
+            "teamId": 111,
+            "inningsPitched": 0,
+            "pitches": 0,
+            "battersFaced": 0,
+            "hits": 0,
+            "runs": 0,
+            "earnedRuns": 0,
+            "baseOnBalls": 0,
+            "strikeOuts": 0
+        }
+    ]
+}

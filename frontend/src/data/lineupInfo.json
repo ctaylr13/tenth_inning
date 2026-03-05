@@ -1,0 +1,130 @@
+{
+    "roster": [
+        {
+            "id": 1,
+            "name": "Duran",
+            "position": 7,
+            "battingOrder": 100,
+            "throws": "L",
+            "bats": "L",
+            "number": 16,
+            "teamId": 140
+        },
+        {
+            "id": 2,
+            "name": "Devers",
+            "position": "DH",
+            "battingOrder": 200,
+            "throws": "L",
+            "bats": "L",
+            "number": 11,
+            "teamId": 140
+        },
+        {
+            "id": 3,
+            "name": "Bregman",
+            "position": 5,
+            "battingOrder": 300,
+            "throws": "L",
+            "bats": "R",
+            "number": 2,
+            "teamId": 140
+        },
+        {
+            "id": 4,
+            "name": "Casas",
+            "position": 3,
+            "battingOrder": 400,
+            "throws": "L",
+            "bats": "L",
+            "number": 36,
+            "teamId": 140
+        },
+        {
+            "id": 5,
+            "name": "Story",
+            "position": 6,
+            "battingOrder": 500,
+            "throws": "L",
+            "bats": "R",
+            "number": 10,
+            "teamId": 140
+        },
+        {
+            "id": 6,
+            "name": "Campbell",
+            "position": 4,
+            "battingOrder": 600,
+            "throws": "R",
+            "bats": "L",
+            "number": 28,
+            "teamId": 140
+        },
+        {
+            "id": 7,
+            "name": "Abreu",
+            "position": 2,
+            "battingOrder": 700,
+            "throws": "L",
+            "bats": "L",
+            "number": 52,
+            "teamId": 140
+        },
+        {
+            "id": 8,
+            "name": "Wong",
+            "position": 2,
+            "battingOrder": 800,
+            "throws": "R",
+            "bats": "R",
+            "number": 12,
+            "teamId": 140
+        },
+        {
+            "id": 9,
+            "name": "Rafaela",
+            "position": 8,
+            "battingOrder": 900,
+            "throws": "R",
+            "bats": "R",
+            "number": 3,
+            "teamId": 140
+        },
+        {
+            "id": 10,
+            "name": "Crochet",
+            "position": 1,
+            "pitchingOrder": 100,
+            "throws": "L",
+            "number": 33,
+            "teamId": 140
+        },
+        {
+            "id": 10,
+            "name": "Whitlock",
+            "position": 1,
+            "pitchingOrder": 200,
+            "throws": "R",
+            "number": 34,
+            "teamId": 140
+        },
+        {
+            "id": 10,
+            "name": "Chapman",
+            "position": 1,
+            "pitchingOrder": 300,
+            "throws": "L",
+            "number": 99,
+            "teamId": 140
+        },
+        {
+            "id": 11,
+            "name": "Slaten",
+            "position": 1,
+            "pitchingOrder": 400,
+            "throws": "R",
+            "number": 17,
+            "teamId": 140
+        }
+    ]
+}

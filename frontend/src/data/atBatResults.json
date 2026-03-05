@@ -1,0 +1,293 @@
+{
+    "results": [
+        {
+            "paID": 1,
+            "playerId": 1,
+            "teamId": 140,
+            "result": "4-3",
+            "inning": 1,
+            "pitches": [],
+            "isOut": true,
+            "outNumber": 1
+        },
+        {
+            "paID": 2,
+            "playerId": 2,
+            "teamId": 140,
+            "inning": 1,
+            "result": "k",
+            "pitches": [
+                {
+                    "index": 1,
+                    "type": "strike"
+                },
+                {
+                    "index": 2,
+                    "type": "called_strike"
+                },
+                {
+                    "index": 3,
+                    "type": "ball"
+                }
+            ],
+            "isOut": true,
+            "outNumber": 2
+        },
+        {
+            "paID": 3,
+            "playerId": 3,
+            "teamId": 140,
+            "inning": 1,
+            "result": "5-3",
+            "pitches": [
+                {
+                    "index": 1,
+                    "type": "ball"
+                },
+                {
+                    "index": 2,
+                    "type": "ball"
+                },
+                {
+                    "index": 3,
+                    "type": "ball"
+                },
+                {
+                    "index": 4,
+                    "type": "foul"
+                },
+                {
+                    "index": 5,
+                    "type": "strike"
+                }
+            ],
+            "isOut": true,
+            "outNumber": 3
+        },
+        {
+            "paID": 4,
+            "playerId": 5,
+            "teamId": 140,
+            "result": "4-3",
+            "inning": 1,
+            "isHome": true,
+            "pitches": [
+                {
+                    "index": 1,
+                    "type": "strike"
+                },
+                {
+                    "index": 2,
+                    "type": "strike"
+                },
+                {
+                    "index": 3,
+                    "type": "ball"
+                }
+            ],
+            "isOut": true,
+            "outNumber": 1
+        },
+        {
+            "paID": 5,
+            "playerId": 6,
+            "teamId": 140,
+            "result": "L7",
+            "inning": 1,
+            "isHome": true,
+            "pitches": [],
+            "isOut": true,
+            "outNumber": 2
+        },
+        {
+            "paID": 5,
+            "playerId": 6,
+            "teamId": 140,
+            "result": "walk",
+            "inning": 1,
+            "isHome": true,
+            "fullCount": true,
+            "onBase": true,
+            "leftOnBase": true,
+            "outNumber": null,
+            "pitches": [
+                {
+                    "index": 1,
+                    "type": "ball"
+                },
+                {
+                    "index": 2,
+                    "type": "ball"
+                },
+                {
+                    "index": 3,
+                    "type": "ball"
+                }
+            ]
+        },
+        {
+            "paID": 7,
+            "playerId": 7,
+            "teamId": 140,
+            "result": "L8",
+            "inning": 1,
+            "isHome": true,
+            "fullCount": true,
+            "onBase": true,
+            "leftOnBase": true,
+            "outNumber": null,
+            "pitches": []
+        },
+        {
+            "paID": 5,
+            "playerId": 8,
+            "teamId": 140,
+            "result": "walk",
+            "inning": 1,
+            "isHome": true,
+            "fullCount": true,
+            "onBase": true,
+            "isThreeBall": true,
+            "leftOnBase": false,
+            "outNumber": null,
+            "rbiCredit": 8,
+            "scoringPlay": true,
+            "pitches": [
+                {
+                    "index": 1,
+                    "type": "ball"
+                },
+                {
+                    "index": 2,
+                    "type": "ball"
+                },
+                {
+                    "index": 3,
+                    "type": "ball"
+                }
+            ],
+            "movement": [
+                {
+                    "startBase": 1,
+                    "endBase": 2,
+                    "credit": 6
+                },
+                {
+                    "startBase": 2,
+                    "endBase": 3,
+                    "credit": 8
+                },
+                {
+                    "startBase": 3,
+                    "endBase": 4,
+                    "credit": 8
+                }
+            ]
+        },
+        {
+            "paID": 5,
+            "playerId": 9,
+            "teamId": 140,
+            "result": "single",
+            "defensiveFielder": 9,
+            "inning": 1,
+            "isHome": true,
+            "fullCount": true,
+            "onBase": true,
+            "leftOnBase": true,
+            "outNumber": null,
+            "rbiCredit": 8,
+            "scoringPlay": true,
+            "pitches": [
+                {
+                    "index": 1,
+                    "type": "strike"
+                },
+                {
+                    "index": 2,
+                    "type": "ball"
+                }
+            ],
+            "movement": [
+                {
+                    "startBase": 1,
+                    "endBase": 2,
+                    "credit": 8
+                }
+            ]
+        },
+        {
+            "paID": 5,
+            "playerId": 9,
+            "teamId": 140,
+            "result": "single",
+            "defensiveFielder": 7,
+            "inning": 2,
+            "isHome": true,
+            "onBase": true,
+            "leftOnBase": true,
+            "outNumber": null,
+            "scoringPlay": false,
+            "pitches": [
+                {
+                    "index": 1,
+                    "type": "strike"
+                },
+                {
+                    "index": 2,
+                    "type": "ball"
+                }
+            ],
+            "movement": []
+        },
+        {
+            "paID": 5,
+            "playerId": 9,
+            "teamId": 140,
+            "result": "P5",
+            "defensiveFielder": 7,
+            "inning": 2,
+            "isHome": false,
+            "fullCount": false,
+            "onBase": false,
+            "leftOnBase": false,
+            "outNumber": 1,
+            "scoringPlay": false,
+            "pitches": [
+                {
+                    "index": 1,
+                    "type": "strike"
+                },
+                {
+                    "index": 2,
+                    "type": "ball"
+                }
+            ],
+            "movement": []
+        },
+        {
+            "paID": 2,
+            "playerId": 2,
+            "teamId": 140,
+            "inning": 1,
+            "result": "k",
+            "isTwoStrikes": true,
+            "pitches": [
+                {
+                    "index": 1,
+                    "type": "strike"
+                },
+                {
+                    "index": 2,
+                    "type": "called_strike"
+                },
+                {
+                    "index": 3,
+                    "type": "ball"
+                }
+            ],
+            "isOut": true,
+            "outNumber": 2
+        }
+    ]
+}

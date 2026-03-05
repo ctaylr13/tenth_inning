@@ -1,0 +1,85 @@
+{
+    "results": [
+        {
+            "playerId": 1,
+            "teamId": 140,
+            "atBats": 4,
+            "runs": 1,
+            "hits": 2,
+            "rbi": 1,
+            "stolenBases": 0
+        },
+        {
+            "playerId": 2,
+            "teamId": 140,
+            "atBats": 4,
+            "runs": 1,
+            "hits": 2,
+            "rbi": 1,
+            "stolenBases": 0
+        },
+        {
+            "playerId": 3,
+            "teamId": 140,
+            "atBats": 4,
+            "runs": 1,
+            "hits": 2,
+            "rbi": 1,
+            "stolenBases": 0
+        },
+        {
+            "playerId": 4,
+            "teamId": 140,
+            "atBats": 0,
+            "runs": 0,
+            "hits": 0,
+            "rbi": 0,
+            "stolenBases": 0
+        },
+        {
+            "playerId": 5,
+            "teamId": 140,
+            "atBats": 4,
+            "runs": 1,
+            "hits": 2,
+            "rbi": 1,
+            "stolenBases": 0
+        },
+        {
+            "playerId": 6,
+            "teamId": 140,
+            "atBats": 4,
+            "runs": 1,
+            "hits": 2,
+            "rbi": 1,
+            "stolenBases": 0
+        },
+        {
+            "playerId": 7,
+            "teamId": 140,
+            "atBats": 4,
+            "runs": 0,
+            "hits": 0,
+            "rbi": 0,
+            "stolenBases": 0
+        },
+        {
+            "playerId": 8,
+            "teamId": 140,
+            "atBats": 4,
+            "runs": 1,
+            "hits": 2,
+            "rbi": 1,
+            "stolenBases": 0
+        },
+        {
+            "playerId": 9,
+            "teamId": 140,
+            "atBats": 4,
+            "runs": 0,
+            "hits": 0,
+            "rbi": 0,
+            "stolenBases": 0
+        }
+    ]
+}

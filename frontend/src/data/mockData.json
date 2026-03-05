@@ -8,34 +8,35 @@
         "attendance": 40000
     },
     "pitchingDecision": [
-    {
-        "name": "Chapman",
-        "status": "Winning"
-    },
-    {
-        "name": "Jackson",
-        "status": "Losing"
-    },
-    {
-        "name": "Slaten",
-        "status": "Save"
-    }
-
+        {
+            "name": "Chapman",
+            "status": "Winning"
+        },
+        {
+            "name": "Jackson",
+            "status": "Losing"
+        },
+        {
+            "name": "Slaten",
+            "status": "Save"
+        }
     ],
-    "boxScore": [{
-        "teamId": 111,
-        "runs": 5,
-        "hits": 7,
-        "errors": 0,
-        "leftOnBase": 4
-    },
-    {
-        "teamId": 140,
-        "runs": 2,
-        "hits": 7,
-        "errors": 0,
-        "leftOnBase": 0
-    }],
+    "boxScore": [
+        {
+            "teamId": 111,
+            "runs": 5,
+            "hits": 7,
+            "errors": 0,
+            "leftOnBase": 4
+        },
+        {
+            "teamId": 140,
+            "runs": 2,
+            "hits": 7,
+            "errors": 0,
+            "leftOnBase": 0
+        }
+    ],
     "officials": [
         {
             "officialType": "Home Plate Umpire",
@@ -189,7 +190,6 @@
                         "bats": "L"
                     }
                 }
-               
             ]
         },
         {
@@ -202,5 +202,4 @@
             "isHome": true
         }
     ]
-
 }

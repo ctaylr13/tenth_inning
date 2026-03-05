@@ -1,0 +1,59 @@
+{
+    "gamePk": 77853,
+    "gameInfo": [
+        {
+            "name": "venue",
+            "value": "Globe Life Field"
+        },
+        {
+            "name": "date",
+            "value": "2025-03-27"
+        },
+        {
+            "name": "firstPitch",
+            "value": "7:05 PM"
+        },
+        {
+            "name": "finalPitch",
+            "value": "10:15 PM"
+        },
+        {
+            "name": "attendance",
+            "value": 40000
+        }
+    ],
+    "officials": [
+        {
+            "type": "Home Plate Umpire",
+            "name": "T. Tichenor"
+        },
+        {
+            "type": "1B Umpire",
+            "name": "J. West"
+        },
+        {
+            "type": "2B Umpire",
+            "name": "A. Hamari"
+        },
+        {
+            "type": "3B Umpire",
+            "name": "N. Ceja"
+        }
+    ],
+    "teamInfo": [
+        {
+            "id": 111,
+            "name": "Boston Red Sox",
+            "manager": "Alex Cora",
+            "uniform": "Road grey",
+            "isHome": false
+        },
+        {
+            "id": 140,
+            "name": "Texas Rangers",
+            "manager": "Bruce Bochy",
+            "uniform": "Home white",
+            "isHome": true
+        }
+    ]
+}
