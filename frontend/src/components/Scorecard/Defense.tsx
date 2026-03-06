@@ -1,6 +1,6 @@
 import { styled } from "@linaria/react";
 
-const FIELD_SIZE = 280;
+const FIELD_SIZE = 240;
 const SCALE = FIELD_SIZE * 0.1;
 const DIAMOND_SIZE = FIELD_SIZE * 0.22;
 
@@ -31,12 +31,12 @@ const Label = styled.div`
 `;
 
 const PlayerName = styled.div`
-    font-size: 10px;
+    font-size: 12px;
+    font-weight: bold;
 `;
 
 const PositionText = styled.div`
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 10px;
 `;
 
 interface FieldPositionProps {
