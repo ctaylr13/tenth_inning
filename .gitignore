@@ -1,6 +1,33 @@
-frontend/package-lock.json
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# virtualenvs (myenv/ is this project's; the rest are common alternates)
+myenv/
+venv/
+.venv/
+env/
+
+# --- Secrets / local config ---
+.env
+.env.*
+!.env.example
+
+# --- Data ---
+# DuckDB files are large and rebuildable from sox_2025/scripts/
 *.duckdb
+*.duckdb.wal
 
+# --- Node / frontend ---
 **/node_modules/**
+frontend/package-lock.json
+*.log
 
+# --- Personal ---
 tdl.txt
