@@ -29,5 +29,9 @@ env/
 frontend/package-lock.json
 *.log
 
-# --- Personal ---
+# --- Tooling ---
+.claude/
+
+claude/
+
 tdl.txt
