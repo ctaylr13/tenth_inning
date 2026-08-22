@@ -29,5 +29,10 @@ env/
 frontend/package-lock.json
 *.log
 
-# --- Personal ---
+# --- Personal / bootcamp scratch ---
+# Bootcamp briefs, quiz logs and reading notes. These quote interview feedback
+# and a company-by-company question bank -- they stay local. Phase 4 artifacts
+# meant to be public go in docs/, not here.
+claude/
+
 tdl.txt
