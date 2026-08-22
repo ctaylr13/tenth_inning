@@ -12,7 +12,7 @@ PEOPLE_URL = "https://statsapi.mlb.com/api/v1/people"
 TIMEOUT = 30
 SLEEP_SECONDS = 0.1
 BATCH_SIZE = 50
-USER_AGENT = "tenth-inning-script/1.0 (ctaylr13@gmail.com)"
+USER_AGENT = "tenth-inning-script/1.0 (6282920+ctaylr13@users.noreply.github.com)"
 
 def safe_get(d: Dict[str, Any], *path, default=None):
     cur = d

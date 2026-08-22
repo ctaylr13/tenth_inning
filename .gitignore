@@ -1,6 +1,38 @@
-frontend/package-lock.json
-*.duckdb
+# --- OS ---
+.DS_Store
+Thumbs.db
 
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# virtualenvs (myenv/ is this project's; the rest are common alternates)
+myenv/
+venv/
+.venv/
+env/
+
+# --- Secrets / local config ---
+.env
+.env.*
+!.env.example
+
+# --- Data ---
+# DuckDB files are large and rebuildable from sox_2025/scripts/
+*.duckdb
+*.duckdb.wal
+
+# --- Node / frontend ---
 **/node_modules/**
+frontend/package-lock.json
+*.log
+
+# --- Personal / bootcamp scratch ---
+# Bootcamp briefs, quiz logs and reading notes. These quote interview feedback
+# and a company-by-company question bank -- they stay local. Phase 4 artifacts
+# meant to be public go in docs/, not here.
+claude/
 
 tdl.txt
