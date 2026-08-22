@@ -7,7 +7,7 @@ from typing import Dict, Any, Optional
 
 DB_PATH = "../../redsox_25.duckdb"
 GAME_URL = "https://statsapi.mlb.com/api/v1/game/{pk}/withMetrics"
-HEADERS = {"User-Agent": "tenth-inning-script/1.0 (ctaylr13@gmail.com)"}
+HEADERS = {"User-Agent": "tenth-inning-script/1.0 (6282920+ctaylr13@users.noreply.github.com)"}
 TIMEOUT = 30
 SLEEP_SECONDS = 0.1
 # LIMIT = 10  # number of gamePks to test/write
