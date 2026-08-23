@@ -16,7 +16,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        // 127.0.0.1, not localhost -- localhost can resolve to ::1 and hit
+        // Docker Desktop's *:8000 instead of the API.
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
       },

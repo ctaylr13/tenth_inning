@@ -36,22 +36,38 @@ resp = requests.get(BASE_URL, params=params, timeout=60)
 resp.raise_for_status()
 data = resp.json()
 
-# Build schedule rows. For each date block, use totalGames to set doubleheader flag.
-records = []
+# A postponed game is listed under BOTH its original date block and its makeup
+# date block, under one gamePk -- 167 entries for 162 games in 2025. Appending
+# every entry puts duplicate gamePks in the table, which then makes every later
+# `UPDATE ... WHERE s.gamePk = u.gamePk` enrichment write to an arbitrary row.
+def rank(game):
+    """Higher wins when one gamePk shows up in two date blocks."""
+    status = (game.get("status") or {}).get("detailedState")
+    game_date = (game.get("gameDate") or "")[:10]
+    return (status != "Postponed", game_date == game.get("officialDate"))
+
+
+best = {}
 for date_block in data.get("dates", []):
-    total_games = date_block.get("totalGames", 0)
-    doubleheader_flag = True if total_games > 1 else False
     for game in date_block.get("games", []):
-        pk = game.get("gamePk")
-        gd = game.get("gameDate")
-        official = game.get("officialDate") or (gd[:10] if gd else None)
-        if pk and gd:
-            records.append({
-                "gamePk": int(pk),
-                "gameDate": gd,
-                "officialDate": official,
-                "doubleheader": doubleheader_flag
-            })
+        pk, gd = game.get("gamePk"), game.get("gameDate")
+        if not (pk and gd):
+            continue
+        pk = int(pk)
+        if pk not in best or rank(game) > rank(best[pk]):
+            best[pk] = game
+
+records = [
+    {
+        "gamePk": int(g["gamePk"]),
+        "gameDate": g["gameDate"],
+        "officialDate": g.get("officialDate") or g["gameDate"][:10],
+        # Per-game, not per-date: totalGames > 1 also flagged the unrelated game
+        # that merely shared a makeup date.
+        "doubleheader": g.get("doubleHeader") in ("Y", "S"),
+    }
+    for g in best.values()
+]
 
 df_schedule = pd.DataFrame(records)
 if not df_schedule.empty:
