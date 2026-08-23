@@ -2,6 +2,7 @@
 export type ErrorCode =
     | "VALIDATION_FAILED"
     | "ROUTE_NOT_FOUND"
+    | "RESOURCE_NOT_FOUND"
     | "DUPLICATE_WATCH_ENTRY"
     | "DATA_SOURCE_UNAVAILABLE"
     | "INTERNAL_ERROR";
@@ -19,6 +20,7 @@ export type ApiError = {
 export type Failure =
     | { status: "invalid"; fields: FieldError[]; error: ApiError }
     | { status: "conflict"; error: ApiError }
+    | { status: "missing"; error: ApiError } // the row, not the route
     | { status: "retry"; error: ApiError } // transient, a retry can succeed
     | { status: "error"; error: ApiError };
 
@@ -66,6 +68,9 @@ export const request = async <T,>(
 
         case "DUPLICATE_WATCH_ENTRY":
             return { status: "conflict", error };
+
+        case "RESOURCE_NOT_FOUND":
+            return { status: "missing", error };
 
         case "DATA_SOURCE_UNAVAILABLE":
             return { status: "retry", error };

@@ -1,11 +1,13 @@
 import logging
 from collections import Counter
+from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any
 
 import duckdb
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
+from fastapi import Path as FastPath
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -14,6 +16,7 @@ from errors import (
     DataSourceUnavailable,
     DuplicateWatchEntry,
     InternalError,
+    ResourceNotFound,
     ValidationFailed,
 )
 
@@ -25,6 +28,8 @@ logging.basicConfig(
 DB_PATH = "redsox_25.duckdb"  # optional: make absolute
 SCHEDULE_TABLE = 'main."2025_schedule"'
 WATCH_TABLE = 'main."watch_history"'
+GAME_INFO_TABLE = 'main."2025_game_info"'
+LINESCORE_TABLE = 'main."line_score_innings"'
 
 
 class WatchRow(BaseModel):
@@ -64,6 +69,150 @@ def get_conn():
         return duckdb.connect(DB_PATH)
     except duckdb.IOException as e:
         raise DataSourceUnavailable() from e
+
+
+def _rows(conn, sql: str, params: list[Any] | None = None) -> list[dict[str, Any]]:
+    """Run a read and hand back JSON-safe dicts. NaN/NaT become null."""
+    df = conn.execute(sql, params or []).fetchdf()
+    return df.where(pd.notnull(df), None).to_dict(orient="records")
+
+
+def _read(sql: str, params: list[Any] | None = None) -> list[dict[str, Any]]:
+    """Every read route's body: one query, the same three failure branches."""
+    conn = get_conn()
+    try:
+        return _rows(conn, sql, params)
+    except duckdb.CatalogException as e:
+        # Our schema is broken, not their request.
+        raise InternalError("A required table is missing from the database.") from e
+    except duckdb.IOException as e:
+        raise DataSourceUnavailable() from e
+    finally:
+        conn.close()
+
+
+class GameResult(str, Enum):
+    """Filter values for /api/games. An unknown one is a 422, not a silent
+    empty list -- the client asked something we don't answer."""
+
+    win = "win"
+    loss = "loss"
+
+
+# The season runs late March to late September, so a month outside 3..9 is a
+# client bug rather than a legitimately empty result.
+SEASON_FIRST_MONTH = 3
+SEASON_LAST_MONTH = 9
+
+
+@app.get("/api/games")
+def list_games(
+    month: Annotated[
+        int | None,
+        Query(
+            ge=SEASON_FIRST_MONTH,
+            le=SEASON_LAST_MONTH,
+            description="Calendar month of the official date, 3-9.",
+        ),
+    ] = None,
+    result: Annotated[
+        GameResult | None, Query(description="Only games the Sox won or lost.")
+    ] = None,
+    watched: Annotated[
+        bool | None, Query(description="Filter by watch-history state.")
+    ] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> dict[str, Any]:
+    """The schedule, filtered and paged.
+
+    Values are bound as parameters, never interpolated -- validation decides
+    whether a request is answerable, it is not what keeps the SQL safe.
+    """
+    where, params = ["1 = 1"], []
+    if month is not None:
+        where.append("MONTH(s.officialDate) = ?")
+        params.append(month)
+    if result is not None:
+        where.append("s.sox_is_winner = ?")
+        params.append(result is GameResult.win)
+    if watched is not None:
+        where.append("COALESCE(w.watched, FALSE) = ?")
+        params.append(watched)
+    clause = " AND ".join(where)
+
+    joined = f"""
+        FROM {SCHEDULE_TABLE} s
+        LEFT JOIN (
+            SELECT gamePk, MAX(watched::INT)::BOOLEAN AS watched
+            FROM {WATCH_TABLE} GROUP BY gamePk
+        ) w USING (gamePk)
+        WHERE {clause}
+    """
+
+    total = _read(f"SELECT COUNT(*) AS n {joined}", params)[0]["n"]
+    items = _read(
+        f"""
+        SELECT s.gamePk,
+               s.gameDate::VARCHAR AS gameDate,
+               s.officialDate::VARCHAR AS officialDate,
+               s.doubleheader,
+               s.home_score, s.away_score, s.sox_is_winner,
+               COALESCE(w.watched, FALSE) AS watched
+        {joined}
+        ORDER BY s.gameDate
+        LIMIT ? OFFSET ?
+        """,
+        [*params, limit, offset],
+    )
+    # A filter that matches nothing is an empty page, not an error.
+    return {"items": items, "total": int(total), "limit": limit, "offset": offset}
+
+
+@app.get("/api/games/{gamePk}")
+def get_game(gamePk: Annotated[int, FastPath(gt=0)]) -> dict[str, Any]:
+    """One game. A gamePk that parses but doesn't exist is a 404, not a 422."""
+    rows = _read(
+        f"""
+        SELECT g.*, s.gameDate::VARCHAR AS gameDate, s.doubleheader,
+               COALESCE(w.watched, FALSE) AS watched
+        FROM {GAME_INFO_TABLE} g
+        JOIN {SCHEDULE_TABLE} s USING (gamePk)
+        LEFT JOIN (
+            SELECT gamePk, MAX(watched::INT)::BOOLEAN AS watched
+            FROM {WATCH_TABLE} GROUP BY gamePk
+        ) w USING (gamePk)
+        WHERE g.gamePk = ?
+        """,
+        [gamePk],
+    )
+    if not rows:
+        raise ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
+    return rows[0]
+
+
+@app.get("/api/games/{gamePk}/linescore")
+def get_linescore(gamePk: Annotated[int, FastPath(gt=0)]) -> dict[str, Any]:
+    """Inning-by-inning for one game.
+
+    A real game with no innings recorded still 404s on the game check above, so
+    an empty innings list means the game exists and wasn't played.
+    """
+    if not _read(f"SELECT 1 FROM {SCHEDULE_TABLE} WHERE gamePk = ? LIMIT 1", [gamePk]):
+        raise ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
+
+    innings = _read(
+        f"""
+        SELECT inning_num, ordinalNum,
+               home_runs, home_hits, home_errors, home_leftOnBase,
+               away_runs, away_hits, away_errors, away_leftOnBase
+        FROM {LINESCORE_TABLE}
+        WHERE gamePk = ?
+        ORDER BY inning_num
+        """,
+        [gamePk],
+    )
+    return {"gamePk": gamePk, "innings": innings}
 
 
 @app.get("/api/schedule")

@@ -86,16 +86,26 @@ async def handle_app_error(request: Request, exc: AppError) -> JSONResponse:
     return _respond(request, exc, exc_info=exc)
 
 
+# FastAPI starts every loc with where the value came from. The client knows
+# which endpoint it called, so that prefix is noise -- and keeping it for query
+# params while dropping it for bodies would make `field` mean two things.
+_REQUEST_LOCATIONS = {"body", "query", "path", "header", "cookie"}
+
+
+def _field_path(loc) -> str:
+    parts = list(loc)
+    if parts and parts[0] in _REQUEST_LOCATIONS:
+        parts = parts[1:]
+    return ".".join(str(p) for p in parts)
+
+
 # FastAPI rejected the request before our code
 async def handle_validation_error(
     request: Request, exc: RequestValidationError
 ) -> JSONResponse:
     # Reshaped so a form can consume it: dotted field path plus the reason.
     fields = [
-        {
-            "field": ".".join(str(p) for p in err.get("loc", []) if p != "body"),
-            "reason": err.get("msg", ""),
-        }
+        {"field": _field_path(err.get("loc", [])), "reason": err.get("msg", "")}
         for err in exc.errors()
     ]
 

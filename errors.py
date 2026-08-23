@@ -15,6 +15,7 @@ from typing import Any
 class ErrorCode(str, Enum):
     VALIDATION_FAILED = "VALIDATION_FAILED"
     ROUTE_NOT_FOUND = "ROUTE_NOT_FOUND"
+    RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND"
     DUPLICATE_WATCH_ENTRY = "DUPLICATE_WATCH_ENTRY"
     DATA_SOURCE_UNAVAILABLE = "DATA_SOURCE_UNAVAILABLE"
     INTERNAL_ERROR = "INTERNAL_ERROR"
@@ -53,6 +54,18 @@ class ValidationFailed(AppError):
     code = ErrorCode.VALIDATION_FAILED
     status_code = 422
     message = "The request failed validation."
+
+
+class ResourceNotFound(AppError):
+    """The route exists and the id parsed -- there just is no such row.
+
+    Distinct from ROUTE_NOT_FOUND, which means the client built a URL we don't
+    serve. This one is normal traffic: asking for a game that isn't there.
+    """
+
+    code = ErrorCode.RESOURCE_NOT_FOUND
+    status_code = 404
+    message = "That resource does not exist."
 
 
 class DuplicateWatchEntry(AppError):
