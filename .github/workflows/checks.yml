@@ -30,8 +30,9 @@ jobs:
 
       # redsox_25.duckdb is gitignored, so there is no database here.
       # tests/conftest.py builds a stand-in and points server.DB_PATH at it.
+      # pytest.ini supplies pythonpath and testpaths.
       - name: pytest
-        run: pytest tests/ -q
+        run: pytest -q
 
   frontend:
     name: frontend (tsc + build)
