@@ -23,4 +23,8 @@ package-lock.json
 *.njsproj
 *.sln
 *.sw?
-yarn.lock
+
+# yarn.lock is committed on purpose -- it is what makes a build reproducible
+# and what `yarn install --frozen-lockfile` checks against in CI.
+# package-lock.json stays ignored above so npm can't quietly become a second
+# source of truth.
