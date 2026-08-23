@@ -1,4 +1,3 @@
-import React from "react";
 import { styled } from "@linaria/react";
 
 const Box = styled.div`

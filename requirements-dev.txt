@@ -1,0 +1,18 @@
+# Development + test dependencies. Not needed to run the API.
+#
+#   ./myenv/bin/pip install -r requirements-dev.txt
+#   ./myenv/bin/python -m pytest tests/ -q
+#
+# httpx is here because FastAPI's TestClient is built on it -- the error
+# contract tests run in-process, with no server and no port.
+
+-r requirements.txt
+
+pytest==9.1.1
+httpx==0.28.1
+
+# Lint and format. Config lives in ruff.toml.
+#
+#   ./myenv/bin/python -m ruff check .
+#   ./myenv/bin/python -m ruff format --check .
+ruff==0.16.4

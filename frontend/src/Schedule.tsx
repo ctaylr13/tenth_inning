@@ -1,138 +1,99 @@
-import { useEffect, useState } from "react";
-import { updateWatchHistory, type DataRow } from "./api/watch_history";
+import { styled } from "@linaria/react";
 
-export type Row = DataRow & { watched?: boolean };
+import ScheduleFailure from "./components/schedule/ScheduleFailure";
+import { useSchedule } from "./components/schedule/useSchedule";
+
+const Page = styled.div`
+    padding: 1rem;
+`;
+
+const Bar = styled.div`
+    margin-bottom: 0.75rem;
+`;
+
+const Table = styled.table`
+    border-collapse: collapse;
+    width: 100%;
+`;
+
+const Th = styled.th`
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+`;
+
+const Td = styled.td`
+    border: 1px solid #eee;
+    padding: 0.5rem;
+`;
+
+const CheckTd = styled(Td)`
+    text-align: center;
+`;
+
+const GameRow = styled.tr`
+    &[data-watched="true"] {
+        background-color: #f0f0f0;
+    }
+`;
 
 export default function Schedule() {
-    const [rows, setRows] = useState<Row[] | null>(null);
-    const [err, setErr] = useState<string | null>(null);
+    const { rows, failure, saveMsg, load, toggleWatched, submit } = useSchedule();
 
-    useEffect(() => {
-        fetch("/api/schedule")
-            .then((res) => {
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return res.json();
-            })
-            .then((data: DataRow[]) => {
-                setRows(data.map((r) => ({ watched: false, ...r })));
-            })
-            .catch((e) => setErr(String(e)));
-    }, []);
-
-    const toggleWatched = (gamePk: number) => {
-        setRows(
-            (prev) =>
-                prev?.map((r) =>
-                    r.gamePk === gamePk ? { ...r, watched: !r.watched } : r
-                ) ?? null
-        );
-    };
-
-    const submit = async () => {
-        try {
-            const resp = await updateWatchHistory(rows);
-            alert(`Saved ${resp?.updated ?? 0} rows`);
-        } catch (e) {
-            alert("Save failed: " + e);
-        }
-    };
-
-    if (err) return <div>Error: {err}</div>;
+    if (failure) {
+        return <ScheduleFailure failure={failure} onRetry={() => void load()} />;
+    }
     if (!rows) return <div>Loading…</div>;
-    if (rows.length === 0) return <div>No schedule data</div>;
+    if (rows.length === 0) return <div>No games on the schedule.</div>;
 
     const watchedCount = rows.filter((r) => r.watched).length;
 
     return (
-        <div style={{ padding: 16 }}>
+        <Page>
             <h1>Red Sox 2025 Schedule</h1>
-            <div style={{ marginBottom: 8 }}>
+            <Bar>
                 Watched: {watchedCount} / {rows.length}
-            </div>
-            <button onClick={submit} style={{ marginBottom: 12 }}>
-                Submit Watch history
-            </button>
+            </Bar>
+            <Bar>
+                <button onClick={() => void submit()}>Submit Watch history</button>
+            </Bar>
+            {saveMsg && <Bar>{saveMsg}</Bar>}
 
-            <table style={{ borderCollapse: "collapse", width: "100%" }}>
+            <Table>
                 <thead>
                     <tr>
-                        <th style={{ border: "1px solid #ccc", padding: 8 }}>
-                            Watched
-                        </th>
-                        <th style={{ border: "1px solid #ccc", padding: 8 }}>
-                            Game PK
-                        </th>
-                        <th style={{ border: "1px solid #ccc", padding: 8 }}>
-                            Game Date (UTC)
-                        </th>
-                        <th style={{ border: "1px solid #ccc", padding: 8 }}>
-                            Official Date
-                        </th>
-                        <th style={{ border: "1px solid #ccc", padding: 8 }}>
-                            Doubleheader
-                        </th>
+                        <Th>Watched</Th>
+                        <Th>Game PK</Th>
+                        <Th>Game Date (UTC)</Th>
+                        <Th>Official Date</Th>
+                        <Th>Doubleheader</Th>
                     </tr>
                 </thead>
                 <tbody>
-                    {rows.map((r, index) => {
-                        const rowStyle: React.CSSProperties = r.watched
-                            ? { backgroundColor: "#f0f0f0" }
-                            : {};
-                        return (
-                            <tr key={index} style={rowStyle}>
-                                <td
-                                    style={{
-                                        border: "1px solid #eee",
-                                        padding: 8,
-                                        textAlign: "center",
-                                    }}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={!!r.watched}
-                                        onChange={() => toggleWatched(r.gamePk)}
-                                    />
-                                </td>
-                                <td
-                                    style={{
-                                        border: "1px solid #eee",
-                                        padding: 8,
-                                    }}
-                                >
-                                    {r.gamePk}
-                                </td>
-                                <td
-                                    style={{
-                                        border: "1px solid #eee",
-                                        padding: 8,
-                                    }}
-                                >
-                                    {new Date(r.gameDate).toLocaleString(
-                                        undefined,
-                                        { timeZone: "UTC" }
-                                    )}
-                                </td>
-                                <td
-                                    style={{
-                                        border: "1px solid #eee",
-                                        padding: 8,
-                                    }}
-                                >
-                                    {r.officialDate ?? ""}
-                                </td>
-                                <td
-                                    style={{
-                                        border: "1px solid " + "#eee",
-                                        padding: 8,
-                                    }}
-                                >
-                                    {r.doubleheader ? "Yes" : "No"}
-                                </td>
-                            </tr>
-                        );
-                    })}
+                    {rows.map((r) => (
+                        // gamePk repeats in the schedule data, so it is not a key on its own
+                        <GameRow
+                            key={`${r.gamePk}-${r.gameDate}`}
+                            data-watched={!!r.watched}
+                        >
+                            <CheckTd>
+                                <input
+                                    type="checkbox"
+                                    checked={!!r.watched}
+                                    onChange={() => toggleWatched(r.gamePk)}
+                                />
+                            </CheckTd>
+                            <Td>{r.gamePk}</Td>
+                            <Td>
+                                {new Date(r.gameDate).toLocaleString(undefined, {
+                                    timeZone: "UTC",
+                                })}
+                            </Td>
+                            <Td>{r.officialDate ?? ""}</Td>
+                            <Td>{r.doubleheader ? "Yes" : "No"}</Td>
+                        </GameRow>
+                    ))}
                 </tbody>
-            </table>
-        </div>
+            </Table>
+        </Page>
     );
 }

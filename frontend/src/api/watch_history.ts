@@ -1,3 +1,5 @@
+import { request, type Outcome } from "./errors";
+
 export type DataRow = {
     gamePk: number;
     gameDate: string;
@@ -7,23 +9,18 @@ export type DataRow = {
 };
 
 export const updateWatchHistory = async (
-    rows: DataRow[] | null | undefined,
+    rows: DataRow[],
     options?: { url?: string }
-): Promise<{ updated: number } | null> => {
-    if (!rows || rows.length === 0) return null;
+): Promise<Outcome<{ updated: number }>> => {
     const payload = rows.map((r) => ({
         gamePk: r.gamePk,
         watched: !!r.watched,
     }));
-    const url = options?.url ?? "http://localhost:8000/api/watchhistory";
-    const res = await fetch(url, {
+    // Relative through the Vite proxy (same-origin, no CORS)
+    const url = options?.url ?? "/api/watchhistory";
+    return request<{ updated: number }>(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
     });
-    if (!res.ok) {
-        const txt = await res.text().catch(() => res.statusText);
-        throw new Error(`HTTP ${res.status}: ${txt}`);
-    }
-    return (await res.json()) as { updated: number };
 };
