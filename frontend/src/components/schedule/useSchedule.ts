@@ -29,20 +29,33 @@ export const useSchedule = () => {
     const [failure, setFailure] = useState<Failure | null>(null);
     const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
-    const load = useCallback(async () => {
-        const res = await request<DataRow[]>("/api/schedule");
-        if (res.status === "ok") {
-            setRows(res.data.map((r) => ({ watched: false, ...r })));
-            setFailure(null);
-        } else {
-            setFailure(res);
-            setRows(null);
-        }
-    }, []);
+    const [reloadToken, setReloadToken] = useState(0);
+
+    // A token bump rather than a direct call, so the effect owns the request
+    // and a response that outlives it can be discarded.
+    const load = useCallback(() => setReloadToken((n) => n + 1), []);
 
     useEffect(() => {
-        void load();
-    }, [load]);
+        let cancelled = false;
+
+        const run = async () => {
+            const res = await request<DataRow[]>("/api/schedule");
+            if (cancelled) return;
+
+            if (res.status === "ok") {
+                setRows(res.data.map((r) => ({ watched: false, ...r })));
+                setFailure(null);
+            } else {
+                setFailure(res);
+                setRows(null);
+            }
+        };
+
+        void run();
+        return () => {
+            cancelled = true;
+        };
+    }, [reloadToken]);
 
     const toggleWatched = useCallback((gamePk: number) => {
         setRows(

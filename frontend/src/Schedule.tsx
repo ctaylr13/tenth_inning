@@ -40,7 +40,7 @@ export default function Schedule() {
     const { rows, failure, saveMsg, load, toggleWatched, submit } = useSchedule();
 
     if (failure) {
-        return <ScheduleFailure failure={failure} onRetry={() => void load()} />;
+        return <ScheduleFailure failure={failure} onRetry={load} />;
     }
     if (!rows) return <div>Loading…</div>;
     if (rows.length === 0) return <div>No games on the schedule.</div>;

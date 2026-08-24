@@ -58,6 +58,15 @@ export const request = async <T,>(
         error = UNKNOWN;
     }
 
+    return classify(error);
+};
+
+/**
+ * Envelope -> Failure. Split out of `request` because the envelope is not an
+ * HTTP artifact -- an error arriving in an SSE frame maps through the same
+ * branches. One switch, three transports.
+ */
+export const classify = (error: ApiError): Failure => {
     switch (error.code) {
         case "VALIDATION_FAILED":
             return {
@@ -79,3 +88,7 @@ export const request = async <T,>(
             return { status: "error", error };
     }
 };
+
+/** For transports with no status line to fall back on. */
+export const unknownFailure = (code: ErrorCode = "INTERNAL_ERROR"): Failure =>
+    classify({ ...UNKNOWN, code });
