@@ -1,4 +1,7 @@
+import asyncio
+import json
 import logging
+import os
 from collections import Counter
 from enum import Enum
 from pathlib import Path
@@ -6,12 +9,13 @@ from typing import Annotated, Any
 
 import duckdb
 import pandas as pd
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi import Path as FastPath
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from error_handlers import install_error_handling
+from error_handlers import get_request_id, install_error_handling
 from errors import (
     DataSourceUnavailable,
     DuplicateWatchEntry,
@@ -19,6 +23,7 @@ from errors import (
     ResourceNotFound,
     ValidationFailed,
 )
+from live import TERMINAL_TYPES, Broadcaster
 
 logging.basicConfig(
     level=logging.INFO,
@@ -40,10 +45,18 @@ class WatchRow(BaseModel):
 app = FastAPI()
 install_error_handling(app)
 
+# The Vite proxy makes dev calls same-origin, so a wrong value here is never
+# exercised until deploy. From the environment, so it can be right there.
+DEV_ORIGINS = ["http://localhost:5173", "http://localhost:5174"]
+CORS_ALLOW_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CORS_ALLOW_ORIGINS", ",".join(DEV_ORIGINS)).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    # Your frontend origin. Use "*" only for dev, if you need it.
-    allow_origins=["http://localhost:5173"],
+    allow_origins=CORS_ALLOW_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -191,17 +204,10 @@ def get_game(gamePk: Annotated[int, FastPath(gt=0)]) -> dict[str, Any]:
     return rows[0]
 
 
-@app.get("/api/games/{gamePk}/linescore")
-def get_linescore(gamePk: Annotated[int, FastPath(gt=0)]) -> dict[str, Any]:
-    """Inning-by-inning for one game.
-
-    A real game with no innings recorded still 404s on the game check above, so
-    an empty innings list means the game exists and wasn't played.
-    """
-    if not _read(f"SELECT 1 FROM {SCHEDULE_TABLE} WHERE gamePk = ? LIMIT 1", [gamePk]):
-        raise ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
-
-    innings = _read(
+def _load_innings(gamePk: int) -> list[dict[str, Any]]:
+    """The one inning query. Shared by the linescore route and the replay ticker
+    so a column added in one place cannot go missing in the other."""
+    return _read(
         f"""
         SELECT inning_num, ordinalNum,
                home_runs, home_hits, home_errors, home_leftOnBase,
@@ -212,7 +218,74 @@ def get_linescore(gamePk: Annotated[int, FastPath(gt=0)]) -> dict[str, Any]:
         """,
         [gamePk],
     )
-    return {"gamePk": gamePk, "innings": innings}
+
+
+@app.get("/api/games/{gamePk}/linescore")
+def get_linescore(gamePk: Annotated[int, FastPath(gt=0)]) -> dict[str, Any]:
+    """Inning-by-inning for one game.
+
+    A real game with no innings recorded still 404s on the game check above, so
+    an empty innings list means the game exists and wasn't played.
+    """
+    if not _read(f"SELECT 1 FROM {SCHEDULE_TABLE} WHERE gamePk = ? LIMIT 1", [gamePk]):
+        raise ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
+
+    return {"gamePk": gamePk, "innings": _load_innings(gamePk)}
+
+
+# the live layer -- see live.py for the fan-out, README.md for why SSE
+broadcaster = Broadcaster(_load_innings)
+
+
+def _sse(event: str, payload: dict[str, Any]) -> str:
+    """One SSE frame. The trailing blank line terminates it -- without it the
+    browser buffers forever."""
+    return f"event: {event}\ndata: {json.dumps(payload, default=str)}\n\n"
+
+
+@app.get("/api/live/{gamePk}")
+async def stream_game(
+    request: Request, gamePk: Annotated[int, FastPath(gt=0)]
+) -> StreamingResponse:
+    """Replay one game's innings as Server-Sent Events.
+    `async def` because subscribing starts an asyncio task, and a sync route runs
+    in a threadpool with no running loop. The existence check is here rather than
+    in the generator because the status code is committed at the first byte --
+    past it a raise is a RuntimeError, not a 404."""
+    exists = await asyncio.to_thread(
+        _read, f"SELECT 1 FROM {SCHEDULE_TABLE} WHERE gamePk = ? LIMIT 1", [gamePk]
+    )
+    if not exists:
+        raise ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
+
+    request_id = get_request_id(request)
+    queue = broadcaster.subscribe(gamePk)
+
+    async def frames():
+        """Must never raise -- past the first byte no handler is left, so a
+        failure has to arrive as an event like any other."""
+        try:
+            yield _sse("open", {"gamePk": gamePk, "request_id": request_id})
+            while True:
+                message = await queue.get()
+                yield _sse(message["type"], message)
+                if message["type"] in TERMINAL_TYPES:
+                    return
+        finally:
+            # Runs on client disconnect too, which is what stops an abandoned
+            # ticker.
+            broadcaster.unsubscribe(gamePk, queue)
+
+    return StreamingResponse(
+        frames(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            # nginx buffers proxied responses by default, holding every event
+            # until the stream ends.
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.get("/api/schedule")
