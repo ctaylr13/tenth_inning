@@ -10,11 +10,13 @@ from typing import Annotated, Any
 
 import duckdb
 import pandas as pd
+from dotenv import load_dotenv
 from fastapi import FastAPI, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi import Path as FastPath
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from sqlalchemy import create_engine
 
 from error_handlers import (
     WS_INTERNAL_ERROR,
@@ -32,6 +34,8 @@ from errors import (
 )
 from live import END_TYPE, TERMINAL_TYPES, Broadcaster
 
+load_dotenv()
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
@@ -44,6 +48,18 @@ GAME_INFO_TABLE = 'main."2025_game_info"'
 LINESCORE_TABLE = 'main."line_score_innings"'
 
 
+# `or`, not .get()'s default arg -- a present-but-empty DATABASE_URL (an unset
+# CI/K8s var, a blanked .env line) would otherwise reach create_engine() below
+# and raise ArgumentError at import, taking down every route including
+# DuckDB's.
+DATABASE_URL = (
+    os.environ.get("DATABASE_URL")
+    or "postgresql://tenth_inning:tenth_inning@127.0.0.1:5433/tenth_inning"
+)
+
+pg_engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+
+
 class WatchRow(BaseModel):
     gamePk: int
     watched: bool
@@ -52,8 +68,7 @@ class WatchRow(BaseModel):
 app = FastAPI()
 install_error_handling(app)
 
-# The Vite proxy makes dev calls same-origin, so a wrong value here is never
-# exercised until deploy. From the environment, so it can be right there.
+
 DEV_ORIGINS = ["http://localhost:5173", "http://localhost:5174"]
 CORS_ALLOW_ORIGINS = [
     origin.strip()
@@ -82,7 +97,6 @@ def _safe_rollback(conn) -> None:
 
 def get_conn():
     # duckdb.connect() creates a missing file instead of raising -- without
-    # this, a fresh clone reports "table missing" instead of the real problem.
     if not Path(DB_PATH).exists():
         raise InternalError(f"Database file {DB_PATH!r} is missing.")
     try:
