@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import os
+import uuid
 from collections import Counter
 from enum import Enum
 from pathlib import Path
@@ -9,19 +10,20 @@ from typing import Annotated, Any
 
 import duckdb
 import pandas as pd
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi import Path as FastPath
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from error_handlers import get_request_id, install_error_handling
+from error_handlers import get_request_id, install_error_handling, log_error
 from errors import (
     DataSourceUnavailable,
     DuplicateWatchEntry,
     InternalError,
     ResourceNotFound,
     ValidationFailed,
+    failure_frame,
 )
 from live import TERMINAL_TYPES, Broadcaster
 
@@ -286,6 +288,132 @@ async def stream_game(
             "X-Accel-Buffering": "no",
         },
     )
+
+
+# --- the same feed over websockets -------------------------------------------
+# Part 3b. The ticker above is reused byte for byte -- Broadcaster knows nothing
+# about HTTP, so the transport is genuinely the only thing that changes. What
+# does NOT come along is everything error_handlers.py installs:
+#
+#   * RequestIDMiddleware is a BaseHTTPMiddleware, which only wraps scopes of
+#     type "http". No middleware runs here, so get_request_id() would return
+#     "-" and the id has to be minted in the route.
+#   * The four exception handlers all return a JSONResponse. There is no
+#     response to return once a socket is open, so `raise ResourceNotFound(...)`
+#     reaches nobody. Every error has to be hand-delivered as a frame.
+#
+# That is the cost the README claims websockets pay at both ends. Here it is.
+
+# RFC 6455 close codes. A different namespace from HTTP status codes, and far
+# coarser: there is no code that separates "the row you asked for isn't there"
+# from "you sent garbage". The 4xx-vs-5xx rule the whole contract turns on has
+# no equivalent, which is why the envelope has to ride inside a message frame
+# and the close code is only ever a hint.
+WS_NORMAL_CLOSURE = 1000
+WS_INTERNAL_ERROR = 1011
+
+# `end` closes clean; `failure` is us breaking, which is the closest thing to a
+# 5xx the protocol offers.
+WS_CLOSE_CODES = {"end": WS_NORMAL_CLOSURE, "failure": WS_INTERNAL_ERROR}
+
+
+async def _ws_send(websocket: WebSocket, message: dict[str, Any]) -> None:
+    """One frame. json.dumps with the same `default=str` as _sse -- the two
+    transports must not disagree about how a stray date serializes."""
+    await websocket.send_text(json.dumps(message, default=str))
+
+
+async def _ws_wait_for_disconnect(websocket: WebSocket) -> None:
+    """Read and throw away every inbound frame, purely to notice the client
+    leaving. The feed is read-only, so this task exists for one reason: SSE gets
+    disconnect detection free (the ASGI server cancels the response generator
+    and its `finally` runs), while a send-only websocket loop blocks on
+    queue.get() and would never wake up. Without this, an abandoned client keeps
+    its ticker alive until the next send happens to fail."""
+    try:
+        while True:
+            if (await websocket.receive())["type"] == "websocket.disconnect":
+                return
+    except (WebSocketDisconnect, RuntimeError):
+        # RuntimeError: receive() after the disconnect was already consumed.
+        return
+
+
+@app.websocket("/api/live/ws/{gamePk}")
+async def stream_game_ws(
+    websocket: WebSocket, gamePk: Annotated[int, FastPath(gt=0)]
+) -> None:
+    """Replay one game's innings over a websocket.
+
+    Accept first, then report. Closing during the handshake instead would be the
+    honest analogue of a 404, but the browser WebSocket API exposes no status
+    code and no body for a rejected handshake -- the client would get a bare
+    `error` event and could not tell "no such game" from "the API is down".
+    Accepting costs us the status line (every failure now looks like a 101 to
+    proxies, load balancers and metrics) and buys back the envelope. That trade
+    is the transport's defining property, not a workaround.
+    """
+    # No middleware ran, so there is no id to read off request.state.
+    request_id = uuid.uuid4().hex[:12]
+    await websocket.accept()
+
+    exists = await asyncio.to_thread(
+        _read, f"SELECT 1 FROM {SCHEDULE_TABLE} WHERE gamePk = ? LIMIT 1", [gamePk]
+    )
+    if not exists:
+        # The same exception the SSE route raises -- built, not raised, because
+        # every handler returns a JSONResponse and there is no response left to
+        # return. Reusing the class is what stops the message and details
+        # drifting away from the 404 the other transports send.
+        error = ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
+        log_error("WS", websocket.url.path, error, request_id)
+        await _ws_send(
+            websocket,
+            {
+                "gamePk": gamePk,
+                **failure_frame(error.code, error.message, request_id, error.details),
+            },
+        )
+        # Not WS_INTERNAL_ERROR: the client was fine. There is no close code for
+        # "that row does not exist", so the code says "clean" and the frame
+        # carries the truth.
+        await websocket.close(code=WS_NORMAL_CLOSURE)
+        return
+
+    queue = broadcaster.subscribe(gamePk)
+    # Started before the first send so a client that vanishes mid-handshake is
+    # still noticed.
+    reader = asyncio.create_task(_ws_wait_for_disconnect(websocket))
+
+    try:
+        await _ws_send(
+            websocket, {"type": "open", "gamePk": gamePk, "request_id": request_id}
+        )
+
+        while True:
+            pending = asyncio.ensure_future(queue.get())
+            done, _ = await asyncio.wait(
+                {pending, reader}, return_when=asyncio.FIRST_COMPLETED
+            )
+            if reader in done:
+                pending.cancel()
+                return
+
+            message = pending.result()
+            await _ws_send(websocket, message)
+            if message["type"] in TERMINAL_TYPES:
+                # Close explicitly. Returning would close it too, but with a
+                # code Starlette picked rather than one that means something.
+                await websocket.close(code=WS_CLOSE_CODES[message["type"]])
+                return
+    except WebSocketDisconnect:
+        # The client left between the wait and the send.
+        return
+    finally:
+        reader.cancel()
+        # Same guarantee as the SSE generator's finally: the ticker stops when
+        # its last subscriber goes, however the loop exited.
+        broadcaster.unsubscribe(gamePk, queue)
 
 
 @app.get("/api/schedule")
