@@ -16,7 +16,8 @@ from fastapi import Path as FastPath
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from error_handlers import (
     WS_INTERNAL_ERROR,
@@ -43,15 +44,12 @@ logging.basicConfig(
 
 DB_PATH = "redsox_25.duckdb"  # optional: make absolute
 SCHEDULE_TABLE = 'main."2025_schedule"'
-WATCH_TABLE = 'main."watch_history"'
 GAME_INFO_TABLE = 'main."2025_game_info"'
 LINESCORE_TABLE = 'main."line_score_innings"'
 
 
-# `or`, not .get()'s default arg -- a present-but-empty DATABASE_URL (an unset
-# CI/K8s var, a blanked .env line) would otherwise reach create_engine() below
-# and raise ArgumentError at import, taking down every route including
-# DuckDB's.
+# `or` not .get()'s default -- empty string is falsy but present, and would
+# otherwise skip the fallback and crash create_engine() at import.
 DATABASE_URL = (
     os.environ.get("DATABASE_URL")
     or "postgresql://tenth_inning:tenth_inning@127.0.0.1:5433/tenth_inning"
@@ -87,12 +85,18 @@ app.add_middleware(
 logger = logging.getLogger("tenth_inning")
 
 
-def _safe_rollback(conn) -> None:
-    """Roll back without ever masking the exception that got us here."""
+def _watched_true_pks() -> set[int]:
+    """gamePks with watched=TRUE in Postgres. Not present means False."""
     try:
-        conn.execute("ROLLBACK")
-    except duckdb.Error:
-        logger.warning("ROLLBACK failed", exc_info=True)
+        with pg_engine.connect() as conn:
+            rows = conn.execute(
+                text('SELECT "gamePk" FROM watch_history WHERE watched')
+            )
+            return {row[0] for row in rows}
+    except OperationalError as e:
+        raise DataSourceUnavailable() from e
+    except ProgrammingError as e:
+        raise InternalError("A required table is missing from the database.") from e
 
 
 def get_conn():
@@ -163,6 +167,9 @@ def list_games(
     Values are bound as parameters, never interpolated -- validation decides
     whether a request is answerable, it is not what keeps the SQL safe.
     """
+    # watched can't be a SQL join across two engines -- fetched once instead.
+    watched_pks = _watched_true_pks()
+
     where, params = ["1 = 1"], []
     if month is not None:
         where.append("MONTH(s.officialDate) = ?")
@@ -171,18 +178,18 @@ def list_games(
         where.append("s.sox_is_winner = ?")
         params.append(result is GameResult.win)
     if watched is not None:
-        where.append("COALESCE(w.watched, FALSE) = ?")
-        params.append(watched)
+        if watched_pks:
+            placeholders = ",".join("?" for _ in watched_pks)
+            op = "IN" if watched else "NOT IN"
+            where.append(f"s.gamePk {op} ({placeholders})")
+            params.extend(watched_pks)
+        elif watched:
+            # Nothing is watched, so "watched=true" matches nothing.
+            where.append("1 = 0")
+        # else: nothing is watched, so "watched=false" already matches everything.
     clause = " AND ".join(where)
 
-    joined = f"""
-        FROM {SCHEDULE_TABLE} s
-        LEFT JOIN (
-            SELECT gamePk, MAX(watched::INT)::BOOLEAN AS watched
-            FROM {WATCH_TABLE} GROUP BY gamePk
-        ) w USING (gamePk)
-        WHERE {clause}
-    """
+    joined = f"FROM {SCHEDULE_TABLE} s WHERE {clause}"
 
     total = _read(f"SELECT COUNT(*) AS n {joined}", params)[0]["n"]
     items = _read(
@@ -191,14 +198,15 @@ def list_games(
                s.gameDate::VARCHAR AS gameDate,
                s.officialDate::VARCHAR AS officialDate,
                s.doubleheader,
-               s.home_score, s.away_score, s.sox_is_winner,
-               COALESCE(w.watched, FALSE) AS watched
+               s.home_score, s.away_score, s.sox_is_winner
         {joined}
         ORDER BY s.gameDate
         LIMIT ? OFFSET ?
         """,
         [*params, limit, offset],
     )
+    for item in items:
+        item["watched"] = item["gamePk"] in watched_pks
     # A filter that matches nothing is an empty page, not an error.
     return {"items": items, "total": int(total), "limit": limit, "offset": offset}
 
@@ -208,21 +216,18 @@ def get_game(gamePk: Annotated[int, FastPath(gt=0)]) -> dict[str, Any]:
     """One game. A gamePk that parses but doesn't exist is a 404, not a 422."""
     rows = _read(
         f"""
-        SELECT g.*, s.gameDate::VARCHAR AS gameDate, s.doubleheader,
-               COALESCE(w.watched, FALSE) AS watched
+        SELECT g.*, s.gameDate::VARCHAR AS gameDate, s.doubleheader
         FROM {GAME_INFO_TABLE} g
         JOIN {SCHEDULE_TABLE} s USING (gamePk)
-        LEFT JOIN (
-            SELECT gamePk, MAX(watched::INT)::BOOLEAN AS watched
-            FROM {WATCH_TABLE} GROUP BY gamePk
-        ) w USING (gamePk)
         WHERE g.gamePk = ?
         """,
         [gamePk],
     )
     if not rows:
         raise ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
-    return rows[0]
+    row = rows[0]
+    row["watched"] = gamePk in _watched_true_pks()
+    return row
 
 
 def _load_innings(gamePk: int) -> list[dict[str, Any]]:
@@ -398,47 +403,27 @@ async def stream_game_ws(
 
 @app.get("/api/schedule")
 def get_schedule() -> list[dict[str, Any]]:
-    conn = get_conn()
-    try:
-        # LEFT JOIN watched where the table exists, else default FALSE.
-        tables = [r[0].lower() for r in conn.execute("SHOW TABLES").fetchall()]
-        has_watch = "watch_history" in tables
+    # DuckDB first, so a broken schedule fails before touching Postgres.
+    items = _read(f"""
+        SELECT s.gamePk,
+               s.gameDate::VARCHAR AS gameDate,
+               s.officialDate::VARCHAR AS officialDate,
+               s.doubleheader
+        FROM {SCHEDULE_TABLE} s
+        ORDER BY s.gameDate
+    """)
+    watched_pks = _watched_true_pks()
+    for item in items:
+        item["watched"] = item["gamePk"] in watched_pks
+    # Zero games is an empty state: 200 [], never 204 -- [] is a body.
+    return items
 
-        if has_watch:
-            sql = f"""
-            SELECT s.gamePk,
-                s.gameDate::VARCHAR AS gameDate,
-                s.officialDate::VARCHAR AS officialDate,
-                s.doubleheader,
-                COALESCE(w.watched, FALSE) AS watched
-            FROM {SCHEDULE_TABLE} s
-            LEFT JOIN (
-                SELECT gamePk, MAX(watched::INT)::BOOLEAN AS watched
-                FROM {WATCH_TABLE}
-                GROUP BY gamePk
-            ) w USING (gamePk)
-            ORDER BY s.gameDate
-            """
-        else:
-            sql = f"""
-            SELECT s.gamePk,
-                   s.gameDate::VARCHAR AS gameDate,
-                   s.officialDate::VARCHAR AS officialDate,
-                   s.doubleheader,
-                   FALSE AS watched
-            FROM {SCHEDULE_TABLE} s
-            ORDER BY s.gameDate
-            """
-        df = conn.execute(sql).fetchdf()
-        # Zero games is an empty state: 200 [], never 204 -- [] is a body.
-        return df.where(pd.notnull(df), None).to_dict(orient="records")
-    except duckdb.CatalogException as e:
-        # Our schema is broken, not their request.
-        raise InternalError("A required table is missing from the database.") from e
-    except duckdb.IOException as e:
-        raise DataSourceUnavailable() from e
-    finally:
-        conn.close()
+
+UPSERT_WATCHED = text("""
+    INSERT INTO watch_history ("gamePk", watched)
+    VALUES (:gamePk, :watched)
+    ON CONFLICT ("gamePk") DO UPDATE SET watched = EXCLUDED.watched
+""")
 
 
 @app.put("/api/watchhistory")
@@ -447,58 +432,18 @@ def update_watchhistory(rows: list[WatchRow]):
         # 400 not 422: the body parsed, it just carries nothing to do.
         raise ValidationFailed("No rows provided.", status_code=400)
 
-    # Ambiguous when duplicates disagree, and watch_history has no unique key.
     duplicates = sorted(
         pk for pk, n in Counter(r.gamePk for r in rows).items() if n > 1
     )
     if duplicates:
         raise DuplicateWatchEntry(duplicates=duplicates)
 
-    conn = get_conn()
     try:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS "watch_history" (
-                gamePk BIGINT,
-                watched BOOLEAN DEFAULT FALSE
-            )
-        """)
-
-        conn.execute("BEGIN TRANSACTION")
-        df_tmp = pd.DataFrame([r.model_dump() for r in rows])
-        conn.register("tmp_rows", df_tmp)
-
-        conn.execute("""
-            CREATE TEMPORARY TABLE tmp_watch AS
-            SELECT CAST(gamePk AS BIGINT) AS gamePk, watched::BOOLEAN AS watched FROM tmp_rows
-        """)
-
-        conn.execute("""
-            UPDATE "watch_history" AS w
-            SET watched = t.watched
-            FROM tmp_watch t
-            WHERE w.gamePk = t.gamePk
-        """)
-
-        conn.execute("""
-            INSERT INTO "watch_history"(gamePk, watched)
-            SELECT t.gamePk, t.watched
-            FROM tmp_watch t
-            LEFT JOIN "watch_history" w ON t.gamePk = w.gamePk
-            WHERE w.gamePk IS NULL
-        """)
-
-        conn.execute("COMMIT")
-        conn.unregister("tmp_rows")
-        return {"updated": len(rows)}
-    except duckdb.IOException as e:
-        _safe_rollback(conn)
+        with pg_engine.begin() as conn:  # commits or rolls back on exit
+            for r in rows:
+                conn.execute(UPSERT_WATCHED, {"gamePk": r.gamePk, "watched": r.watched})
+    except OperationalError as e:
         raise DataSourceUnavailable() from e
-    except duckdb.CatalogException as e:
-        _safe_rollback(conn)
+    except ProgrammingError as e:
         raise InternalError("A required table is missing from the database.") from e
-    except Exception:
-        # Re-raise unclassified -- handle_unexpected logs it and returns a 500.
-        _safe_rollback(conn)
-        raise
-    finally:
-        conn.close()
+    return {"updated": len(rows)}

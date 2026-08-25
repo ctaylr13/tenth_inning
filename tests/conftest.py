@@ -7,16 +7,31 @@ the real database.
 
 Tests that want a *different* database (missing file, empty file) monkeypatch
 DB_PATH themselves; that runs after this fixture, so it wins.
+
+Needs docker-compose Postgres running + `alembic upgrade head` against
+tenth_inning_test (watch_history) -- a separate database, not the dev one,
+same reason as the DuckDB file above: this suite truncates it.
 """
+
+import os
+
+os.environ["DATABASE_URL"] = (
+    "postgresql://tenth_inning:tenth_inning@127.0.0.1:5433/tenth_inning_test"
+)
 
 import duckdb
 import pytest
+from sqlalchemy import text
 
 import server
 
+# Captured once, before any test can monkeypatch server.pg_engine -- so this
+# fixture's teardown still hits the real database even if the test faked it.
+REAL_PG_ENGINE = server.pg_engine
+
 # Three games across two months, one already watched: enough for the schedule
-# route's LEFT JOIN branch, a write that hits one existing and one new gamePk,
-# and every /api/games filter (month, result, watched, paging).
+# route's watch-state merge, a write that hits one existing and one new
+# gamePk, and every /api/games filter (month, result, watched, paging).
 #   gamePk, gameDate, officialDate, doubleheader, home_score, away_score, sox_won
 SCHEDULE_ROWS = [
     (777, "2025-03-27 20:05:00", "2025-03-27", False, 5, 3, True),
@@ -86,15 +101,21 @@ def fixture_db(tmp_path, monkeypatch):
             'INSERT INTO "line_score_innings" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             LINESCORE_ROWS,
         )
-        conn.execute("""
-            CREATE TABLE "watch_history" (
-                gamePk BIGINT,
-                watched BOOLEAN DEFAULT FALSE
-            )
-        """)
-        conn.execute('INSERT INTO "watch_history" VALUES (777, TRUE)')
     finally:
         conn.close()
 
     monkeypatch.setattr(server, "DB_PATH", str(path))
     return path
+
+
+@pytest.fixture(autouse=True)
+def fixture_watch_history():
+    """Postgres's watch_history, reset to one seed row (777, TRUE) per test."""
+    with REAL_PG_ENGINE.begin() as conn:
+        conn.execute(text("TRUNCATE TABLE watch_history"))
+        conn.execute(
+            text('INSERT INTO watch_history ("gamePk", watched) VALUES (777, TRUE)')
+        )
+    yield
+    with REAL_PG_ENGINE.begin() as conn:
+        conn.execute(text("TRUNCATE TABLE watch_history"))

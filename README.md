@@ -53,12 +53,13 @@ cp .env.example .env      # first time only
 docker compose up -d
 ```
 
-`server.py` reads `DATABASE_URL` from `.env` (`load_dotenv()` runs before anything
-touches `os.environ` — uvicorn doesn't load `.env` on its own) and opens a
-[SQLAlchemy](https://www.sqlalchemy.org/) engine, `pg_engine`. `create_engine()` is a
-pool factory, not a connection — it succeeds even with the container stopped, and
-every existing route still reads DuckDB exactly as before. No route queries Postgres
-yet and no table has moved; this is the wiring the actual move will use.
+`server.py` reads `DATABASE_URL` from `.env` and opens a SQLAlchemy engine,
+`pg_engine`. `watch_history` lives here now — schema via Alembic, not
+hand-written `CREATE TABLE IF NOT EXISTS`:
+
+```bash
+myenv/bin/alembic upgrade head
+```
 
 ```bash
 psql -h 127.0.0.1 -p 5433 -U tenth_inning -d tenth_inning
@@ -87,6 +88,14 @@ the container, and reading it back.
 `docker compose ps` reports `healthy` rather than just `Up` because the service has a
 `pg_isready` healthcheck — a running container is not the same as a Postgres that is
 accepting connections, and that gap is the first boot's cluster initialization.
+
+Tests use a separate `tenth_inning_test` database, not the one above — same reason
+DuckDB tests use a throwaway file instead of `redsox_25.duckdb`. One-time setup:
+
+```bash
+psql -h 127.0.0.1 -p 5433 -U tenth_inning -d tenth_inning -c "CREATE DATABASE tenth_inning_test;"
+DATABASE_URL=postgresql://tenth_inning:tenth_inning@127.0.0.1:5433/tenth_inning_test myenv/bin/alembic upgrade head
+```
 
 ---
 
@@ -225,7 +234,7 @@ process and therefore already unable to reach the connection list.
 | Part 2  | Read endpoints with real validation — `/api/games`, `/api/games/{gamePk}`, `/api/games/{gamePk}/linescore`                 | Done        |
 | Part 3  | Live layer: SSE + REST polling, contrasted side by side (`/api/live/{gamePk}`, `live.py`, `frontend/src/api/live.ts`)      | Done        |
 | Part 3b | The websocket version, to feel what it costs (`/api/live/ws/{gamePk}`, `frontend/src/api/liveSocket.ts`)                   | Done        |
-| Part 4  | Postgres for transactional state, DuckDB for analytics — `docker-compose.yml` stands the database up; nothing reads it yet | In progress |
+| Part 4  | Postgres for transactional state, DuckDB for analytics — `watch_history` moved, via Alembic                               | In progress |
 | Part 5  | Deploy: one container, real origins, real HTTPS, a health check                                                            | After 4     |
 
 Open work is tracked in `tdl.txt`, which is gitignored — it's a scratch list, not a
