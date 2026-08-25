@@ -15,6 +15,7 @@ from diagrams import Cluster, Diagram, Edge, Node
 from diagrams.generic.storage import Storage
 from diagrams.onprem.client import Client
 from diagrams.onprem.compute import Server
+from diagrams.onprem.database import Postgresql
 from diagrams.onprem.inmemory import Redis
 from diagrams.programming.framework import FastAPI, React
 
@@ -88,6 +89,7 @@ def transports() -> None:
             poll_ui = React("useSchedule.load()\nwrapped in setInterval")
             poll_api = FastAPI("GET /api/schedule\nfull request/response")
             poll_db = Storage("DuckDB\nredsox_25.duckdb")
+            poll_watch = Postgresql("Postgres\nwatch_history")
             poll_note = Note(
                 "CONTRACT: fully intact\n"
                 "every tick is a whole HTTP transaction,\n"
@@ -107,6 +109,11 @@ def transports() -> None:
                     color=COST,
                 )
                 >> poll_db
+            )
+            (
+                poll_api
+                >> Edge(label="  watched state\n  merged in Python (two engines)")
+                >> poll_watch
             )
             poll_api >> Edge(color=KEEPS, style="dotted") >> poll_note
             # invisible edge: ranks the note BELOW the bottom row so the

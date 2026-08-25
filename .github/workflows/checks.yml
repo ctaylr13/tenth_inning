@@ -9,6 +9,25 @@ jobs:
   api:
     name: api (ruff + pytest)
     runs-on: ubuntu-latest
+    services:
+      # watch_history lives here now -- tests need it running, same as local.
+      # conftest.py forces DATABASE_URL to this name regardless of the env
+      # below, so this has to be the same database that's migrated here.
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: tenth_inning
+          POSTGRES_PASSWORD: tenth_inning
+          POSTGRES_DB: tenth_inning_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U tenth_inning -d tenth_inning_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://tenth_inning:tenth_inning@127.0.0.1:5433/tenth_inning_test
     steps:
       - uses: actions/checkout@v7
 
@@ -27,6 +46,9 @@ jobs:
 
       - name: ruff format --check
         run: ruff format --check .
+
+      - name: alembic upgrade head
+        run: alembic upgrade head
 
       # redsox_25.duckdb is gitignored, so there is no database here.
       # tests/conftest.py builds a stand-in and points server.DB_PATH at it.

@@ -1,15 +1,15 @@
 # Runtime dependencies for the API (server.py).
 #
 # The DuckDB file itself is not in the repo -- it is gitignored because it is
-# ~78MB and rebuildable from sox_2025/scripts/. server.py fails with a clear
-# 500 ("Database file ... is missing") rather than silently creating an empty
-# one, so a fresh clone tells you what's wrong.
 
 fastapi==0.128.7
 uvicorn==0.40.0
-# Plain uvicorn speaks HTTP only. /api/live/ws/{gamePk} needs a websocket
-# implementation underneath it, and without one the handshake is refused.
 websockets==16.0
 duckdb==1.4.4
 pandas==3.0.0
 pydantic==2.12.5
+python-dotenv==1.2.1
+SQLAlchemy==2.0.47
+psycopg2-binary==2.9.12
+alembic==1.18.4
+

@@ -11,6 +11,7 @@ which also sidesteps the Docker-on-8000 collision entirely.
 import duckdb
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 import server
 from errors import ErrorCode
@@ -177,53 +178,51 @@ def test_missing_table_is_500_not_404(tmp_path, monkeypatch):
 
 
 # --- the write path's own error branches ------------------------------------
-#
-# The tests above patch duckdb.connect, so they fail inside get_conn() and never
-# enter update_watchhistory's try block. These drive a connection that fails
-# mid-transaction, which is the only way to cover its except branches -- without
-# them, re-adding `except Exception: raise HTTPException(500, str(e))` passes.
 
 
-class _FailingConn:
-    """A connection that raises on any real statement, but lets ROLLBACK through."""
+class _FailingPgEngine:
+    """Stands in for pg_engine -- every execute() raises the given exc."""
 
     def __init__(self, exc):
         self.exc = exc
         self.rolled_back = False
 
-    def execute(self, sql, *args, **kwargs):
-        if sql.strip().upper().startswith("ROLLBACK"):
+    def begin(self):
+        return self
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        if exc_type is not None:
             self.rolled_back = True
-            return self
+        return False
+
+    def execute(self, *args, **kwargs):
         raise self.exc
-
-    def register(self, *a, **k):
-        pass
-
-    def unregister(self, *a, **k):
-        pass
-
-    def close(self):
-        pass
 
 
 PAYLOAD = [{"gamePk": 777, "watched": True}]
 
 
-def _put_with_failing_conn(monkeypatch, exc):
-    conn = _FailingConn(exc)
-    monkeypatch.setattr(server, "get_conn", lambda: conn)
-    return client.put("/api/watchhistory", json=PAYLOAD), conn
+def _put_with_failing_pg(monkeypatch, exc):
+    engine = _FailingPgEngine(exc)
+    monkeypatch.setattr(server, "pg_engine", engine)
+    return client.put("/api/watchhistory", json=PAYLOAD), engine
 
 
 def test_locked_database_during_write_is_503(monkeypatch):
-    r, _ = _put_with_failing_conn(monkeypatch, duckdb.IOException("lock"))
+    exc = OperationalError("INSERT ...", {}, Exception("could not connect"))
+    r, _ = _put_with_failing_pg(monkeypatch, exc)
     assert r.status_code == 503
     assert envelope(r)["code"] == ErrorCode.DATA_SOURCE_UNAVAILABLE.value
 
 
 def test_missing_table_during_write_is_500(monkeypatch):
-    r, _ = _put_with_failing_conn(monkeypatch, duckdb.CatalogException("no table"))
+    exc = ProgrammingError(
+        "INSERT ...", {}, Exception('relation "watch_history" does not exist')
+    )
+    r, _ = _put_with_failing_pg(monkeypatch, exc)
     assert r.status_code == 500
     assert envelope(r)["code"] == ErrorCode.INTERNAL_ERROR.value
 
@@ -235,7 +234,7 @@ def test_unexpected_write_failure_is_500_and_leaks_nothing(monkeypatch):
     the exception text -- table names, paths, query structure -- in the body.
     """
     secret = "internal_table_name_xyz"
-    r, _ = _put_with_failing_conn(monkeypatch, RuntimeError(secret))
+    r, _ = _put_with_failing_pg(monkeypatch, RuntimeError(secret))
     assert r.status_code == 500
     assert envelope(r)["code"] == ErrorCode.INTERNAL_ERROR.value
     assert secret not in r.text
@@ -243,8 +242,8 @@ def test_unexpected_write_failure_is_500_and_leaks_nothing(monkeypatch):
 
 def test_failed_write_is_rolled_back(monkeypatch):
     """A half-written transaction must not survive the error."""
-    _, conn = _put_with_failing_conn(monkeypatch, RuntimeError("boom"))
-    assert conn.rolled_back
+    _, engine = _put_with_failing_pg(monkeypatch, RuntimeError("boom"))
+    assert engine.rolled_back
 
 
 # --- request ids ------------------------------------------------------------

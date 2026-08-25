@@ -1,0 +1,32 @@
+# Local Postgres for Phase 4 (Postgres for transactional, DuckDB for analytical).
+#
+# DuckDB is a library server.py imports; Postgres is a service it calls over
+# the network (server.py's pg_engine) -- this file only stands it up.
+#
+# Start:   docker compose up -d
+# Stop:    docker compose down          (keeps the data)
+# Nuke:    docker compose down -v       (deletes the volume, and the data with it)
+
+services:
+  postgres:
+    # Pinned, not :latest -- the deploy target (Fly/Render) will pin too, and a
+    image: postgres:17
+    container_name: tenth_inning-postgres
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tenth_inning}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tenth_inning}
+      POSTGRES_DB: ${POSTGRES_DB:-tenth_inning}
+
+    volumes:
+      - tenth_inning_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tenth_inning} -d ${POSTGRES_DB:-tenth_inning}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  tenth_inning_pgdata:
