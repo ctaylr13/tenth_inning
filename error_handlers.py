@@ -2,12 +2,9 @@
 
 All five are required -- drop one and a class of failure escapes the envelope.
 Each handler only turns its exception into an AppError; `_respond` owns the
-envelope and the header and `log_error` owns the log line, so one place can
-drift, not five.
-
-Four of them answer HTTP and return a JSONResponse. The fifth answers a
-websocket, where there is no response to return and no middleware has run --
-Part 3b's cost, made explicit.
+envelope and header, `log_error` owns the log line, so one place can drift, not
+five. Four answer HTTP; the fifth answers a websocket, where there is no
+response to return and no middleware has run.
 """
 
 from __future__ import annotations
@@ -68,10 +65,8 @@ def log_error(
     *,
     exc_info: BaseException | None = None,
 ) -> None:
-    """One log format for every failure, whatever transport it came in on --
-    `method` is "WS" for a websocket. The id in this line is the one the client
-    was handed, which is the only thing tying the two together.
-    """
+    """One log format for every failure, whatever transport carried it --
+    `method` is "WS" for a websocket."""
     is_server_error = error.status_code >= 500
 
     # 4xx is normal traffic -- info level, and no traceback even when we have one.

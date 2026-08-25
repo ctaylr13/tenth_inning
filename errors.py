@@ -107,11 +107,9 @@ def error_body(
     }
 
 
-# --- the same envelope, as a message ----------------------------------------
-# Transports that cannot carry a status code have to deliver errors in-band, so
-# the envelope needs a wrapper the client can route on. `failure`, not `error`:
-# EventSource fires its own `error` event on connection loss and the two would
-# land on the same listener.
+# the same envelope, as a message
+# `failure`, not `error` -- EventSource fires its own `error` on connection loss
+# and both would land on one listener.
 FAILURE_TYPE = "failure"
 
 
@@ -121,7 +119,6 @@ def failure_frame(
     request_id: str,
     details: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """An error as a message rather than a response. SSE events, websocket
-    frames and FastAPI's websocket validation handler all send this, so
-    errors.ts classifies one shape no matter which transport carried it."""
+    """An error as a message, for transports with no status code to carry one.
+    Same shape every time, so errors.ts classifies one thing."""
     return {"type": FAILURE_TYPE, **error_body(code, message, request_id, details)}
