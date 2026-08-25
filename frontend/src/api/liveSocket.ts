@@ -3,11 +3,8 @@ import { useEffect, useState } from "react";
 import { classify, unknownFailure, type ApiError, type Failure } from "./errors";
 import type { Inning, LiveStatus } from "./live";
 
-/**
- * The frames the server sends. One union with a `type` discriminant, because a
- * websocket has no equivalent of SSE's `event:` line -- there is exactly one
- * onmessage handler and routing is the client's job.
- */
+/** One union with a `type` discriminant -- there is no `event:` line here, so
+ * routing is the client's job. */
 type Frame =
     | { type: "open"; gamePk: number; request_id: string }
     | { type: "inning"; gamePk: number; seq: number; inning: Inning }
@@ -19,8 +16,7 @@ export type SocketGame = {
     status: LiveStatus;
     failure: Failure | null;
     requestId: string | null;
-    /** Reconnects this client has spent. EventSource does this silently and
-     * for free; here it is code we own, so it is a number we can show. */
+    /** Reconnects spent. EventSource does this silently; here we own it. */
     reconnects: number;
 };
 
@@ -36,32 +32,24 @@ const initial = (gamePk: number | null): State => ({
 });
 
 /**
- * `new WebSocket("/api/live/ws/1")` throws -- the constructor has no relative
- * form, so the client has to rebuild the absolute URL the browser assembles for
- * free on every other call in this app, scheme included.
- *
- * That scheme swap is the part worth staring at. Dev is http, so `ws:` is
- * always right here and the `wss:` branch is never once exercised until the
- * first deploy behind TLS. Same shape as CORS_ALLOW_ORIGINS in server.py:
- * config that can be wrong for months because nothing local runs it.
+ * `new WebSocket("/api/live/ws/1")` throws -- there is no relative form, so the
+ * absolute URL is ours to build. Dev is http, so the `wss:` branch is never
+ * exercised until the first deploy behind TLS.
  */
-export const socketUrl = (gamePk: number): string => {
+const socketUrl = (gamePk: number): string => {
     const scheme = window.location.protocol === "https:" ? "wss:" : "ws:";
     return `${scheme}//${window.location.host}/api/live/ws/${gamePk}`;
 };
 
-// EventSource picks its own backoff and never tells you what it chose. These
-// are the same decision, made in the open.
+// EventSource picks these and never tells you which.
 const RETRY_BASE_MS = 500;
 const RETRY_MAX_MS = 8000;
 const MAX_RETRIES = 4;
 
 /**
- * Subscribe to one game's replayed inning feed over a websocket.
- *
- * Same feed, same frames, same `classify()` as the SSE hook. Everything below
- * the message handler is what SSE got for free: URL assembly, reconnect,
- * backoff, giving up, and deciding which failures are even worth retrying.
+ * Subscribe to one game's replayed inning feed over a websocket. Same frames and
+ * same `classify()` as the SSE hook -- the reconnect machinery below is what
+ * EventSource did for free.
  */
 export const useSocketGame = (gamePk: number | null): SocketGame => {
     const [state, setState] = useState<State>(() => initial(gamePk));
@@ -76,8 +64,7 @@ export const useSocketGame = (gamePk: number | null): SocketGame => {
         let socket: WebSocket | null = null;
         let retryTimer: ReturnType<typeof setTimeout> | undefined;
         let attempt = 0;
-        // A close is only expected after a terminal frame or our own teardown.
-        // Anything else is a drop, and drops are the thing to reconnect from.
+        // A close is expected only after a terminal frame or our teardown.
         let finished = false;
         let unmounted = false;
 
@@ -95,8 +82,7 @@ export const useSocketGame = (gamePk: number | null): SocketGame => {
                 switch (frame.type) {
                     case "open":
                         // A reconnect replays from inning 1 rather than
-                        // resuming -- the ticker has no idea we were here
-                        // before -- so the list resets with the connection.
+                        // resuming, so the list resets with the connection.
                         attempt = 0;
                         setState((prev) => ({
                             ...prev,
@@ -125,11 +111,8 @@ export const useSocketGame = (gamePk: number | null): SocketGame => {
                         break;
 
                     case "failure":
-                        // The payoff for hand-delivering the envelope. This
-                        // close is final rather than something to retry, and
-                        // the only reason we can know that is `error.code` --
-                        // the close code alone cannot tell "no such game" from
-                        // "the database blinked".
+                        // Final, not retryable -- and `error.code` is the only
+                        // reason we can tell which. The close code cannot.
                         finished = true;
                         setState((prev) => ({
                             ...prev,
@@ -140,10 +123,8 @@ export const useSocketGame = (gamePk: number | null): SocketGame => {
                 }
             };
 
-            // No onerror handler: the browser hands it an Event with no code,
-            // no reason and no status, deliberately, so a page cannot probe the
-            // network it is on. Every error is followed by a close, so close is
-            // the only place a decision can actually be made.
+            // No onerror handler -- the browser hands it an Event with no code,
+            // reason or status. Every error is followed by a close anyway.
             socket.onclose = () => {
                 if (unmounted || finished) return;
 
@@ -173,8 +154,7 @@ export const useSocketGame = (gamePk: number | null): SocketGame => {
         connect();
 
         return () => {
-            // Order matters: the flag has to be set before close(), or our own
-            // teardown fires onclose and schedules a reconnect to nowhere.
+            // Before close(), or our own teardown schedules a reconnect.
             unmounted = true;
             clearTimeout(retryTimer);
             socket?.close();

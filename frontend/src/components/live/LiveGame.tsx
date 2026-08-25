@@ -1,7 +1,8 @@
 import { styled } from "@linaria/react";
 
 import type { Failure } from "../../api/errors";
-import type { Inning } from "../../api/live";
+// Aliased -- the page component below is also called LiveGame.
+import type { Inning, LiveGame as LiveFeed } from "../../api/live";
 import { POLL_INTERVAL_MS } from "../../api/pollGame";
 import { useLiveComparison } from "./useLiveComparison";
 
@@ -93,14 +94,40 @@ const FailureNote = ({ failure }: { failure: Failure }) => (
 );
 
 /**
- * The same game, delivered three ways, side by side.
- *
- * The efficiency argument belongs to SSE and websockets equally -- both cost
- * one connection and one database read however long they run, while the polling
- * counter climbs every second for identical data. So efficiency is not what
- * separates the first two columns. What separates them is how much of the
- * client is transport code: the websocket column carries a reconnect counter
- * because reconnecting is something it has to do itself.
+ * Both live transports render identically -- same status, same envelope, same
+ * empty state -- because the frames are the same. Only the connection count and
+ * where the request id comes from differ, so those are props.
+ */
+const FeedPanel = ({
+    title,
+    feed,
+    connections,
+    requestIdNote,
+}: {
+    title: string;
+    feed: LiveFeed;
+    connections: number;
+    requestIdNote: string;
+}) => (
+    <Panel>
+        <h2>{title}</h2>
+        <Meta>status: {feed.status}</Meta>
+        <Meta>connections opened: {connections}</Meta>
+        <Meta>
+            request id: {feed.requestId ?? "—"} ({requestIdNote})
+        </Meta>
+        {feed.failure && <FailureNote failure={feed.failure} />}
+        {!feed.failure && feed.status === "done" && feed.innings.length === 0 && (
+            <Meta>game exists, nothing recorded — empty state, not an error</Meta>
+        )}
+        <Linescore innings={feed.innings} />
+    </Panel>
+);
+
+/**
+ * The same game, delivered three ways. Efficiency belongs to both live
+ * transports equally, so it is not what separates them -- the reconnect counter
+ * is, because reconnecting is code the websocket column had to write.
  */
 const LiveGame = () => {
     const { input, setInput, gamePk, valid, start, stop, live, socket, polled } =
@@ -128,46 +155,19 @@ const LiveGame = () => {
                 <Meta>pick a gamePk and start the feed</Meta>
             ) : (
                 <Columns>
-                    <Panel>
-                        <h2>SSE</h2>
-                        <Meta>status: {live.status}</Meta>
-                        <Meta>connections opened: 1</Meta>
-                        <Meta>
-                            request id: {live.requestId ?? "—"} (per connection)
-                        </Meta>
-                        {live.failure && <FailureNote failure={live.failure} />}
-                        {!live.failure &&
-                            live.status === "done" &&
-                            live.innings.length === 0 && (
-                                <Meta>
-                                    game exists, nothing recorded — empty state,
-                                    not an error
-                                </Meta>
-                            )}
-                        <Linescore innings={live.innings} />
-                    </Panel>
+                    <FeedPanel
+                        title="SSE"
+                        feed={live}
+                        connections={1}
+                        requestIdNote="per connection"
+                    />
 
-                    <Panel>
-                        <h2>Websocket</h2>
-                        <Meta>status: {socket.status}</Meta>
-                        <Meta>connections opened: {socket.reconnects + 1}</Meta>
-                        <Meta>
-                            request id: {socket.requestId ?? "—"} (minted in the
-                            route — no middleware runs here)
-                        </Meta>
-                        {socket.failure && (
-                            <FailureNote failure={socket.failure} />
-                        )}
-                        {!socket.failure &&
-                            socket.status === "done" &&
-                            socket.innings.length === 0 && (
-                                <Meta>
-                                    game exists, nothing recorded — empty state,
-                                    not an error
-                                </Meta>
-                            )}
-                        <Linescore innings={socket.innings} />
-                    </Panel>
+                    <FeedPanel
+                        title="Websocket"
+                        feed={socket}
+                        connections={socket.reconnects + 1}
+                        requestIdNote="minted in the route — no middleware here"
+                    />
 
                     <Panel>
                         <h2>REST polling</h2>
