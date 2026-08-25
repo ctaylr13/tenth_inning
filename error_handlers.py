@@ -1,17 +1,23 @@
-"""Request-ID middleware plus the four exception handlers.
+"""Request-ID middleware plus the five exception handlers.
 
-All four are required -- drop one and a class of failure escapes the envelope.
-Each handler only turns its exception into an AppError; `_respond` owns the log
-line, the envelope and the header, so one place can drift, not four.
+All five are required -- drop one and a class of failure escapes the envelope.
+Each handler only turns its exception into an AppError; `_respond` owns the
+envelope and the header and `log_error` owns the log line, so one place can
+drift, not five.
+
+Four of them answer HTTP and return a JSONResponse. The fifth answers a
+websocket, where there is no response to return and no middleware has run --
+Part 3b's cost, made explicit.
 """
 
 from __future__ import annotations
 
+import json
 import logging
 import uuid
 
-from fastapi import FastAPI, Request
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI, Request, WebSocket
+from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -22,6 +28,7 @@ from errors import (
     InternalError,
     ValidationFailed,
     error_body,
+    failure_frame,
 )
 
 logger = logging.getLogger("tenth_inning")
@@ -53,14 +60,18 @@ def get_request_id(request: Request) -> str:
     return str(getattr(request.state, "request_id", "-"))
 
 
-def _respond(
-    request: Request,
+def log_error(
+    method: str,
+    path: str,
     error: AppError,
+    request_id: str,
     *,
     exc_info: BaseException | None = None,
-) -> JSONResponse:
-    """Log the failure and return the envelope. The module's only exit."""
-    request_id = get_request_id(request)
+) -> None:
+    """One log format for every failure, whatever transport it came in on --
+    `method` is "WS" for a websocket. The id in this line is the one the client
+    was handed, which is the only thing tying the two together.
+    """
     is_server_error = error.status_code >= 500
 
     # 4xx is normal traffic -- info level, and no traceback even when we have one.
@@ -68,11 +79,22 @@ def _respond(
     # Grouped to mirror the format string above it: where, then what, then why.
     (logger.error if is_server_error else logger.info)(
         "%s %s -> %s %s [request_id=%s] %s %s",
-        request.method, request.url.path, error.status_code,
+        method, path, error.status_code,
         error.code.value, request_id, error.message, error.details,
         exc_info=exc_info if is_server_error else None,
     )
     # fmt: on
+
+
+def _respond(
+    request: Request,
+    error: AppError,
+    *,
+    exc_info: BaseException | None = None,
+) -> JSONResponse:
+    """Log the failure and return the envelope. The HTTP handlers' only exit."""
+    request_id = get_request_id(request)
+    log_error(request.method, request.url.path, error, request_id, exc_info=exc_info)
 
     return JSONResponse(
         status_code=error.status_code,
@@ -144,10 +166,52 @@ async def handle_unexpected(request: Request, exc: Exception) -> JSONResponse:
     return _respond(request, InternalError(), exc_info=exc)
 
 
+# the same rejection, on a transport with no response to reject with
+# RFC 6455 close codes. A separate namespace from HTTP status codes and much
+# coarser -- 1008 is the whole 4xx range.
+WS_POLICY_VIOLATION = 1008
+
+
+async def handle_websocket_validation_error(
+    websocket: WebSocket, exc: WebSocketRequestValidationError
+) -> None:
+    """The fifth handler, and the one the websocket transport forced.
+
+    FastAPI's default rejects the handshake with 1008 and pydantic's raw error
+    list as the close reason -- internals `handle_validation_error` exists to
+    reshape, on a channel the browser cannot read anyway (a handshake-phase
+    close reaches JavaScript as a bare 1006 with no reason at all).
+
+    So: accept, then report. That costs the rejection its status line -- every
+    bad request now looks like a successful 101 to proxies and metrics -- and
+    buys back the envelope, which is the only thing that lets the client tell
+    "you sent a bad gamePk" from "the API is down". Same trade stream_game_ws
+    makes for a missing game, made in the same direction on purpose.
+    """
+    # No middleware runs on a websocket scope, so there is no id to read back.
+    request_id = uuid.uuid4().hex[:12]
+    error = ValidationFailed(
+        fields=[
+            {"field": _field_path(err.get("loc", [])), "reason": err.get("msg", "")}
+            for err in exc.errors()
+        ]
+    )
+    log_error("WS", websocket.url.path, error, request_id)
+
+    await websocket.accept()
+    await websocket.send_text(
+        json.dumps(failure_frame(error.code, error.message, request_id, error.details))
+    )
+    await websocket.close(code=WS_POLICY_VIOLATION)
+
+
 def install_error_handling(app: FastAPI) -> None:
-    """Wire the middleware and all four handlers onto the app. One call."""
+    """Wire the middleware and all five handlers onto the app. One call."""
     app.add_middleware(RequestIDMiddleware)
     app.add_exception_handler(AppError, handle_app_error)
     app.add_exception_handler(RequestValidationError, handle_validation_error)
     app.add_exception_handler(StarletteHTTPException, handle_http_exception)
     app.add_exception_handler(Exception, handle_unexpected)
+    app.add_exception_handler(
+        WebSocketRequestValidationError, handle_websocket_validation_error
+    )
