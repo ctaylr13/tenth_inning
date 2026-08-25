@@ -21,6 +21,11 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
+        // Websockets are not proxied unless you ask. Without this the
+        // handshake gets a plain 200 from Vite instead of a 101, and the
+        // client sees a close with no code -- the failure mode the socket
+        // hook's giving-up branch exists for.
+        ws: true,
       },
     },
   },

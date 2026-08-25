@@ -93,17 +93,22 @@ const FailureNote = ({ failure }: { failure: Failure }) => (
 );
 
 /**
- * The same game, delivered two ways, side by side. The numbers are the point:
- * SSE costs one connection and one read however long it runs, while the polling
- * counter climbs every second for identical data.
+ * The same game, delivered three ways, side by side.
+ *
+ * The efficiency argument belongs to SSE and websockets equally -- both cost
+ * one connection and one database read however long they run, while the polling
+ * counter climbs every second for identical data. So efficiency is not what
+ * separates the first two columns. What separates them is how much of the
+ * client is transport code: the websocket column carries a reconnect counter
+ * because reconnecting is something it has to do itself.
  */
 const LiveGame = () => {
-    const { input, setInput, gamePk, valid, start, stop, live, polled } =
+    const { input, setInput, gamePk, valid, start, stop, live, socket, polled } =
         useLiveComparison();
 
     return (
         <Page>
-            <h1>Live layer — SSE vs REST polling</h1>
+            <h1>Live layer — SSE vs websocket vs REST polling</h1>
 
             <Controls>
                 <input
@@ -140,6 +145,28 @@ const LiveGame = () => {
                                 </Meta>
                             )}
                         <Linescore innings={live.innings} />
+                    </Panel>
+
+                    <Panel>
+                        <h2>Websocket</h2>
+                        <Meta>status: {socket.status}</Meta>
+                        <Meta>connections opened: {socket.reconnects + 1}</Meta>
+                        <Meta>
+                            request id: {socket.requestId ?? "—"} (minted in the
+                            route — no middleware runs here)
+                        </Meta>
+                        {socket.failure && (
+                            <FailureNote failure={socket.failure} />
+                        )}
+                        {!socket.failure &&
+                            socket.status === "done" &&
+                            socket.innings.length === 0 && (
+                                <Meta>
+                                    game exists, nothing recorded — empty state,
+                                    not an error
+                                </Meta>
+                            )}
+                        <Linescore innings={socket.innings} />
                     </Panel>
 
                     <Panel>
