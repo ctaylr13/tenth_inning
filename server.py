@@ -290,46 +290,27 @@ async def stream_game(
     )
 
 
-# --- the same feed over websockets -------------------------------------------
-# Part 3b. The ticker above is reused byte for byte -- Broadcaster knows nothing
-# about HTTP, so the transport is genuinely the only thing that changes. What
-# does NOT come along is everything error_handlers.py installs:
-#
-#   * RequestIDMiddleware is a BaseHTTPMiddleware, which only wraps scopes of
-#     type "http". No middleware runs here, so get_request_id() would return
-#     "-" and the id has to be minted in the route.
-#   * The four exception handlers all return a JSONResponse. There is no
-#     response to return once a socket is open, so `raise ResourceNotFound(...)`
-#     reaches nobody. Every error has to be hand-delivered as a frame.
-#
-# That is the cost the README claims websockets pay at both ends. Here it is.
-
-# RFC 6455 close codes. A different namespace from HTTP status codes, and far
-# coarser: there is no code that separates "the row you asked for isn't there"
-# from "you sent garbage". The 4xx-vs-5xx rule the whole contract turns on has
-# no equivalent, which is why the envelope has to ride inside a message frame
-# and the close code is only ever a hint.
+# the same feed over websockets -- same ticker, none of the error handling
+# Neither half of error_handlers.py reaches a websocket scope: the middleware is
+# a BaseHTTPMiddleware, and every handler returns a JSONResponse.
 WS_NORMAL_CLOSURE = 1000
 WS_INTERNAL_ERROR = 1011
 
-# `end` closes clean; `failure` is us breaking, which is the closest thing to a
-# 5xx the protocol offers.
+# RFC 6455 has no code for "that row does not exist" -- 1011 is the closest
+# thing to a 5xx, and the frame carries what the code cannot.
 WS_CLOSE_CODES = {"end": WS_NORMAL_CLOSURE, "failure": WS_INTERNAL_ERROR}
 
 
 async def _ws_send(websocket: WebSocket, message: dict[str, Any]) -> None:
-    """One frame. json.dumps with the same `default=str` as _sse -- the two
-    transports must not disagree about how a stray date serializes."""
+    """One frame. Same `default=str` as _sse -- the transports must not disagree
+    about how a stray date serializes."""
     await websocket.send_text(json.dumps(message, default=str))
 
 
 async def _ws_wait_for_disconnect(websocket: WebSocket) -> None:
-    """Read and throw away every inbound frame, purely to notice the client
-    leaving. The feed is read-only, so this task exists for one reason: SSE gets
-    disconnect detection free (the ASGI server cancels the response generator
-    and its `finally` runs), while a send-only websocket loop blocks on
-    queue.get() and would never wake up. Without this, an abandoned client keeps
-    its ticker alive until the next send happens to fail."""
+    """Notice the client leaving. SSE gets this free when the ASGI server
+    cancels its generator; a send-only socket loop is parked on queue.get() and
+    nothing wakes it, so an abandoned ticker would run on."""
     try:
         while True:
             if (await websocket.receive())["type"] == "websocket.disconnect":
@@ -345,15 +326,11 @@ async def stream_game_ws(
 ) -> None:
     """Replay one game's innings over a websocket.
 
-    Accept first, then report. Closing during the handshake instead would be the
-    honest analogue of a 404, but the browser WebSocket API exposes no status
-    code and no body for a rejected handshake -- the client would get a bare
-    `error` event and could not tell "no such game" from "the API is down".
-    Accepting costs us the status line (every failure now looks like a 101 to
-    proxies, load balancers and metrics) and buys back the envelope. That trade
-    is the transport's defining property, not a workaround.
-    """
-    # No middleware ran, so there is no id to read off request.state.
+    Accept first, then report. A rejected handshake reaches JavaScript as a bare
+    close with no status and no body, so the client could not tell "no such
+    game" from "the API is down". Accepting costs the status line -- every
+    failure now looks like a 101 on the wire -- and buys back the envelope."""
+    # No middleware ran, so there is no id on request.state to read.
     request_id = uuid.uuid4().hex[:12]
     await websocket.accept()
 
@@ -361,10 +338,8 @@ async def stream_game_ws(
         _read, f"SELECT 1 FROM {SCHEDULE_TABLE} WHERE gamePk = ? LIMIT 1", [gamePk]
     )
     if not exists:
-        # The same exception the SSE route raises -- built, not raised, because
-        # every handler returns a JSONResponse and there is no response left to
-        # return. Reusing the class is what stops the message and details
-        # drifting away from the 404 the other transports send.
+        # Built, not raised -- no handler runs here. Reusing the class is what
+        # keeps the message and details identical to the HTTP 404.
         error = ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
         log_error("WS", websocket.url.path, error, request_id)
         await _ws_send(
@@ -374,15 +349,12 @@ async def stream_game_ws(
                 **failure_frame(error.code, error.message, request_id, error.details),
             },
         )
-        # Not WS_INTERNAL_ERROR: the client was fine. There is no close code for
-        # "that row does not exist", so the code says "clean" and the frame
-        # carries the truth.
+        # Not WS_INTERNAL_ERROR -- the client was fine.
         await websocket.close(code=WS_NORMAL_CLOSURE)
         return
 
     queue = broadcaster.subscribe(gamePk)
-    # Started before the first send so a client that vanishes mid-handshake is
-    # still noticed.
+    # Before the first send, so a client that vanishes mid-handshake is noticed.
     reader = asyncio.create_task(_ws_wait_for_disconnect(websocket))
 
     try:
@@ -402,8 +374,7 @@ async def stream_game_ws(
             message = pending.result()
             await _ws_send(websocket, message)
             if message["type"] in TERMINAL_TYPES:
-                # Close explicitly. Returning would close it too, but with a
-                # code Starlette picked rather than one that means something.
+                # Explicit, or Starlette picks the code instead.
                 await websocket.close(code=WS_CLOSE_CODES[message["type"]])
                 return
     except WebSocketDisconnect:
@@ -411,8 +382,7 @@ async def stream_game_ws(
         return
     finally:
         reader.cancel()
-        # Same guarantee as the SSE generator's finally: the ticker stops when
-        # its last subscriber goes, however the loop exited.
+        # Same guarantee as the SSE generator's finally.
         broadcaster.unsubscribe(gamePk, queue)
 
 
