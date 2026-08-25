@@ -115,3 +115,36 @@ def test_last_subscriber_out_cancels_the_ticker():
         assert broadcaster.subscriber_count(777) == 0
 
     asyncio.run(scenario())
+
+
+def test_two_subscribers_on_one_game_cost_one_read():
+    """The fan-out claim itself. Polling costs one database read per client per
+    tick; the ticker costs one read no matter how many are watching, which is
+    the entire argument for a live transport over polling.
+
+    Driven directly rather than through two HTTP clients on purpose: each
+    TestClient session runs the app in its own event loop, and a queue created
+    in one loop cannot be woken by a put_nowait from another. One loop here is
+    what a real uvicorn process has anyway.
+    """
+    calls = []
+
+    def counted(gamePk: int) -> list[dict]:
+        calls.append(gamePk)
+        return one_inning(gamePk)
+
+    async def scenario():
+        broadcaster = Broadcaster(counted, interval=0)
+        first = broadcaster.subscribe(777)
+        second = broadcaster.subscribe(777)
+
+        assert broadcaster.subscriber_count(777) == 2
+        # Both see the whole feed, not one each -- a fan-out, not a queue split.
+        assert await drain_until_terminal(first) == ["inning", "end"]
+        assert await drain_until_terminal(second) == ["inning", "end"]
+
+        broadcaster.unsubscribe(777, first)
+        broadcaster.unsubscribe(777, second)
+
+    asyncio.run(scenario())
+    assert calls == [777]
