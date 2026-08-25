@@ -11,8 +11,7 @@ Needs graphviz on PATH (`brew install graphviz`).
 
 from pathlib import Path
 
-from diagrams import Cluster, Diagram, Edge
-from diagrams.generic.blank import Blank
+from diagrams import Cluster, Diagram, Edge, Node
 from diagrams.generic.storage import Storage
 from diagrams.onprem.client import Client
 from diagrams.onprem.compute import Server
@@ -30,6 +29,32 @@ COST = "firebrick"
 KEEPS = "darkgreen"
 LOSES = "darkorange"
 
+
+# Blank() is the obvious node for a text-only note and does not work: it has an
+# icon, so diagrams gives it shape="none" and a transparent 1.9in image, and the
+# edge lands on the top of that invisible box with the words drawn near its
+# bottom -- an arrow pointing at nothing. A bare Node has _icon = None.
+def Note(text: str) -> Node:
+    """A visible text box, sized to its own text. Every attribute here overrides
+    one of Diagram._default_node_attrs, which pins nodes to a fixed 1.4in square
+    and anchors labels to the bottom edge -- right for an icon with a caption,
+    wrong for a box that is only caption."""
+    return Node(
+        label=text,
+        shape="box",
+        style="rounded,filled",
+        fillcolor="white",
+        color="gray55",
+        fontsize="11",
+        margin="0.22,0.16",
+        fixedsize="false",
+        # Minimums once fixedsize is off, so the label decides.
+        width="0.1",
+        height="0.1",
+        labelloc="c",
+    )
+
+
 GRAPH_ATTR = {
     "fontsize": "20",
     "bgcolor": "white",
@@ -46,7 +71,7 @@ GRAPH_ATTR = {
 def transports() -> None:
     """The three paths side by side. Read each column top to bottom.
 
-    Long-form commentary lives in Blank note nodes rather than edge labels --
+    Long-form commentary lives in Note() boxes rather than edge labels --
     graphviz routes labelled edges around each other and the text ends up
     orbiting the picture instead of sitting next to what it describes.
     """
@@ -63,7 +88,7 @@ def transports() -> None:
             poll_ui = React("useSchedule.load()\nwrapped in setInterval")
             poll_api = FastAPI("GET /api/schedule\nfull request/response")
             poll_db = Storage("DuckDB\nredsox_25.duckdb")
-            poll_note = Blank(
+            poll_note = Note(
                 "CONTRACT: fully intact\n"
                 "every tick is a whole HTTP transaction,\n"
                 "so 200 / 404 / 503 + envelope all still work.\n"
@@ -94,7 +119,7 @@ def transports() -> None:
             sse_api = FastAPI("GET /api/live/{gamePk}\nStreamingResponse, held open")
             sse_tick = Server("replay ticker\n1 read per TICK, not per client")
             sse_db = Storage("DuckDB\nline_score_innings")
-            sse_note = Blank(
+            sse_note = Note(
                 "CONTRACT: half intact on the wire,\n"
                 "LESS than half in the browser\n"
                 "BEFORE the 1st byte -> real 404 + envelope,\n"
@@ -132,7 +157,7 @@ def transports() -> None:
             )
             ws_tick = Server("replay ticker\n1 read per TICK")
             ws_db = Storage("DuckDB\nline_score_innings")
-            ws_note = Blank(
+            ws_note = Note(
                 "CONTRACT: rebuilt by hand, and BETTER\n"
                 "  than SSE at reaching the browser\n"
                 "no middleware, no handler: both are HTTP-only,\n"
