@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { useLiveGame, type LiveGame } from "../../api/live";
+import { useSocketGame, type SocketGame } from "../../api/liveSocket";
 import { usePolledGame, type PolledGame } from "../../api/pollGame";
 
 /** Pure, so the rule is testable without rendering. */
@@ -17,12 +18,13 @@ export type LiveComparison = {
     start: () => void;
     stop: () => void;
     live: LiveGame;
+    socket: SocketGame;
     polled: PolledGame;
 };
 
-/** The same game over both transports, plus the input driving them. */
+/** The same game over all three transports, plus the input driving them. */
 export const useLiveComparison = (): LiveComparison => {
-    const [input, setInput] = useState("777");
+    const [input, setInput] = useState("778516");
     const [gamePk, setGamePk] = useState<number | null>(null);
 
     // NaN never equals itself, so letting one reach the hooks would make their
@@ -30,6 +32,7 @@ export const useLiveComparison = (): LiveComparison => {
     const parsed = parseGamePk(input);
 
     const live = useLiveGame(gamePk);
+    const socket = useSocketGame(gamePk);
     const polled = usePolledGame(gamePk);
 
     const start = () => {
@@ -45,6 +48,7 @@ export const useLiveComparison = (): LiveComparison => {
         start,
         stop,
         live,
+        socket,
         polled,
     };
 };

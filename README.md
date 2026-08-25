@@ -56,8 +56,8 @@ Three files own it end to end:
 
 | File | Role |
 | --- | --- |
-| [`errors.py`](errors.py) | Typed `AppError` subclasses, the `ErrorCode` enum, and `error_body()` — the single place that knows the envelope's shape |
-| [`error_handlers.py`](error_handlers.py) | Request-ID middleware plus four exception handlers. All four are required; drop one and a class of failure escapes the envelope |
+| [`errors.py`](errors.py) | Typed `AppError` subclasses, the `ErrorCode` enum, `error_body()` — the single place that knows the envelope's shape — and `failure_frame()`, the same envelope as a message for transports with no status line |
+| [`error_handlers.py`](error_handlers.py) | Request-ID middleware plus five exception handlers, all required — drop one and a class of failure escapes the envelope. Each only builds an `AppError`; `_deliver` picks the transport, returning a response over HTTP and sending a frame over a websocket |
 | [`frontend/src/api/errors.ts`](frontend/src/api/errors.ts) | The client half — switches on `error.code`, never on the message or the status number |
 
 The rule the whole thing exists to enforce: **4xx if the client sent something wrong,
@@ -100,19 +100,62 @@ What the picture is actually arguing:
   per tick. That efficiency argument belongs to both live transports equally, which is
   exactly why it is not an argument *for* websockets.
 - The contract degrades differently in each. SSE keeps it for errors raised before the
-  first byte and loses it after (the status code is physically on the wire and
-  immutable). Websockets lose it at both ends and it has to be rebuilt inside message
-  frames.
+  first byte and loses it after — the status code is physically on the wire and
+  immutable. Websockets have no status line at all past the handshake, so the envelope
+  has to be rebuilt inside message frames at both ends.
 
-**Conclusion: SSE is the right answer for a read-only score feed.** The websocket
-version exists to make that a statement from experience rather than from a blog post.
+#### The part building it actually changed
+
+Part 3b was written expecting to confirm that websockets are worse at everything. One
+result came out the other way, and it is only visible from a browser:
+
+**A 404 from the SSE route never reaches the client.** `raise ResourceNotFound(...)`
+happens before the first byte, so the response is a real 404 carrying the full
+envelope — `curl` sees it, the tests see it, the server logs it. But `EventSource`
+**discards the body of any non-200 response**. All the hook gets is an `error` event
+and `readyState === CLOSED`, so `/api/live/999999` renders as a generic *"Something
+went wrong."* with no code and no request id.
+
+The websocket route accepts the socket first and sends the same envelope as a frame,
+so the browser renders *"No game with gamePk 999999."* and the request id. Same
+server, same error, same envelope — one transport can deliver it to a browser and the
+other cannot.
+
+What that costs is real and worth saying out loud: an accepted-then-closed socket is a
+`101` on the wire, so every websocket failure looks like a success to proxies,
+load balancers and metrics. The status code survives only in the server log:
+
+```
+WS /api/live/ws/999999 -> 404 RESOURCE_NOT_FOUND [request_id=45bbdcc2eb5d] No game with gamePk 999999.
+```
+
+Adding the transport also forced a **fifth** exception handler, and rewired the
+other four. FastAPI's default websocket validation handler rejects the handshake
+with close code `1008` and pydantic's raw error list as the reason — internals that
+`handle_validation_error` exists to reshape, on a channel the browser cannot read
+anyway (a handshake-phase close reaches JavaScript as a bare `1006`).
+
+The rewiring was the part that wasn't obvious. Starlette passes a `WebSocket` where
+a `Request` would go, so the existing handlers *are* reached on a websocket — they
+just used to die on `request.method`. Now `_deliver` branches on the connection
+type, which means `raise ResourceNotFound(...)` works identically in both live
+routes, and a failure the route never anticipated (a missing DuckDB file, an IO
+error) arrives as an envelope instead of a dropped socket.
+
+**Conclusion: SSE is still the right answer for a read-only score feed** — reconnect,
+backoff and heartbeats are free there and are hand-written code in
+[`liveSocket.ts`](frontend/src/api/liveSocket.ts) — but the reason is narrower than
+"the contract survives better." It doesn't. It survives *differently*, and on the
+before-the-first-byte case it survives worse.
 
 ### What actually forces a message bus
 
 ![Scale-out](docs/diagrams/live_layer_scaleout.png)
 
-At one API instance, `connections: list[WebSocket]` plus a for-loop **is** the fan-out.
-That is correct engineering, not a shortcut.
+At one API instance, the `dict[int, set[Queue]]` in [`live.py`](live.py) plus a
+for-loop **is** the fan-out. That is correct engineering, not a shortcut. Note that
+the websocket route did not add a second registry: `live.py` imports neither `fastapi`
+nor `duckdb`, so both live transports subscribe to the same ticker.
 
 A bus replaces **the list**, not the for-loop, and only once the list can no longer see
 every client — meaning a second process. The realistic trigger in this repo isn't
@@ -125,10 +168,11 @@ process and therefore already unable to reach the connection list.
 
 | Phase | Scope | State |
 | --- | --- | --- |
-| Part 1 | Error contract: typed errors, one envelope, request-id round trip, four handlers | Done |
+| Part 1 | Error contract: typed errors, one envelope, request-id round trip, five handlers | Done |
 | Part 2 | Read endpoints with real validation — `/api/games`, `/api/games/{gamePk}`, `/api/games/{gamePk}/linescore` | Done |
-| Part 3 | Live layer: SSE + REST polling, contrasted side by side (`/api/live/{gamePk}`, `live.py`, `frontend/src/api/live.ts`) | SSE done |
-| Part 3b | The websocket version, to feel what it costs | Next |
+| Part 3 | Live layer: SSE + REST polling, contrasted side by side (`/api/live/{gamePk}`, `live.py`, `frontend/src/api/live.ts`) | Done |
+| Part 3b | The websocket version, to feel what it costs (`/api/live/ws/{gamePk}`, `frontend/src/api/liveSocket.ts`) | Done |
+| Part 4 | Deploy: one container, real origins, real HTTPS, a health check | Next |
 
 Open work is tracked in `tdl.txt`, which is gitignored — it's a scratch list, not a
 spec.

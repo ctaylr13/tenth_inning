@@ -21,6 +21,9 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
+        // Not proxied unless you ask -- without this the handshake gets a
+        // 200 from Vite instead of a 101.
+        ws: true,
       },
     },
   },

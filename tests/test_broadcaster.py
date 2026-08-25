@@ -115,3 +115,30 @@ def test_last_subscriber_out_cancels_the_ticker():
         assert broadcaster.subscriber_count(777) == 0
 
     asyncio.run(scenario())
+
+
+def test_two_subscribers_on_one_game_cost_one_read():
+    """The fan-out claim itself -- one read no matter how many are watching.
+    Driven directly rather than through two TestClients, which would each run
+    the app in their own event loop and never wake each other's queues."""
+    calls = []
+
+    def counted(gamePk: int) -> list[dict]:
+        calls.append(gamePk)
+        return one_inning(gamePk)
+
+    async def scenario():
+        broadcaster = Broadcaster(counted, interval=0)
+        first = broadcaster.subscribe(777)
+        second = broadcaster.subscribe(777)
+
+        assert broadcaster.subscriber_count(777) == 2
+        # Both see the whole feed, not one each -- a fan-out, not a queue split.
+        assert await drain_until_terminal(first) == ["inning", "end"]
+        assert await drain_until_terminal(second) == ["inning", "end"]
+
+        broadcaster.unsubscribe(777, first)
+        broadcaster.unsubscribe(777, second)
+
+    asyncio.run(scenario())
+    assert calls == [777]

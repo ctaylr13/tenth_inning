@@ -1,7 +1,8 @@
 import { styled } from "@linaria/react";
 
 import type { Failure } from "../../api/errors";
-import type { Inning } from "../../api/live";
+// Aliased -- the page component below is also called LiveGame.
+import type { Inning, LiveGame as LiveFeed } from "../../api/live";
 import { POLL_INTERVAL_MS } from "../../api/pollGame";
 import { useLiveComparison } from "./useLiveComparison";
 
@@ -93,17 +94,48 @@ const FailureNote = ({ failure }: { failure: Failure }) => (
 );
 
 /**
- * The same game, delivered two ways, side by side. The numbers are the point:
- * SSE costs one connection and one read however long it runs, while the polling
- * counter climbs every second for identical data.
+ * Both live transports render identically -- same status, same envelope, same
+ * empty state -- because the frames are the same. Only the connection count and
+ * where the request id comes from differ, so those are props.
+ */
+const FeedPanel = ({
+    title,
+    feed,
+    connections,
+    requestIdNote,
+}: {
+    title: string;
+    feed: LiveFeed;
+    connections: number;
+    requestIdNote: string;
+}) => (
+    <Panel>
+        <h2>{title}</h2>
+        <Meta>status: {feed.status}</Meta>
+        <Meta>connections opened: {connections}</Meta>
+        <Meta>
+            request id: {feed.requestId ?? "—"} ({requestIdNote})
+        </Meta>
+        {feed.failure && <FailureNote failure={feed.failure} />}
+        {!feed.failure && feed.status === "done" && feed.innings.length === 0 && (
+            <Meta>game exists, nothing recorded — empty state, not an error</Meta>
+        )}
+        <Linescore innings={feed.innings} />
+    </Panel>
+);
+
+/**
+ * The same game, delivered three ways. Efficiency belongs to both live
+ * transports equally, so it is not what separates them -- the reconnect counter
+ * is, because reconnecting is code the websocket column had to write.
  */
 const LiveGame = () => {
-    const { input, setInput, gamePk, valid, start, stop, live, polled } =
+    const { input, setInput, gamePk, valid, start, stop, live, socket, polled } =
         useLiveComparison();
 
     return (
         <Page>
-            <h1>Live layer — SSE vs REST polling</h1>
+            <h1>Live layer — SSE vs websocket vs REST polling</h1>
 
             <Controls>
                 <input
@@ -123,24 +155,19 @@ const LiveGame = () => {
                 <Meta>pick a gamePk and start the feed</Meta>
             ) : (
                 <Columns>
-                    <Panel>
-                        <h2>SSE</h2>
-                        <Meta>status: {live.status}</Meta>
-                        <Meta>connections opened: 1</Meta>
-                        <Meta>
-                            request id: {live.requestId ?? "—"} (per connection)
-                        </Meta>
-                        {live.failure && <FailureNote failure={live.failure} />}
-                        {!live.failure &&
-                            live.status === "done" &&
-                            live.innings.length === 0 && (
-                                <Meta>
-                                    game exists, nothing recorded — empty state,
-                                    not an error
-                                </Meta>
-                            )}
-                        <Linescore innings={live.innings} />
-                    </Panel>
+                    <FeedPanel
+                        title="SSE"
+                        feed={live}
+                        connections={1}
+                        requestIdNote="per connection"
+                    />
+
+                    <FeedPanel
+                        title="Websocket"
+                        feed={socket}
+                        connections={socket.reconnects + 1}
+                        requestIdNote="minted in the route — no middleware here"
+                    />
 
                     <Panel>
                         <h2>REST polling</h2>

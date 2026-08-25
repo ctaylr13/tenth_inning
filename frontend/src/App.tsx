@@ -5,7 +5,7 @@ import LiveGame from "./components/live/LiveGame";
 import { useState } from "react";
 
 const App = () => {
-    const [currentAppPage, setCurrentAppPage] = useState("newSchedule");
+    const [currentAppPage, setCurrentAppPage] = useState("live");
 
     const selectPageOnClick = (selectedPage: string) => {
         setCurrentAppPage(selectedPage);

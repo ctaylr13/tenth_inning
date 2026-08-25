@@ -19,7 +19,7 @@ import uuid
 from collections.abc import Callable
 from typing import Any
 
-from errors import ErrorCode, error_body
+from errors import FAILURE_TYPE, ErrorCode, failure_frame
 
 logger = logging.getLogger("tenth_inning")
 
@@ -30,17 +30,16 @@ QUEUE_MAX = 32
 
 DEFAULT_INTERVAL_SECONDS = 1.0
 
-TERMINAL_TYPES = ("end", "failure")
+# `failure` from errors.py, so the frame vocabulary has one owner.
+END_TYPE = "end"
+TERMINAL_TYPES = (END_TYPE, FAILURE_TYPE)
 
 
 def _failure(gamePk: int, message: str) -> dict[str, Any]:
-    """A terminal frame carrying the standard envelope, so the client routes it
-    through the same `classify()` as any HTTP error. Named `failure` rather than
-    `error` -- EventSource fires its own `error` on connection loss."""
+    """The ticker's one failure mode, as a terminal frame."""
     return {
-        "type": "failure",
         "gamePk": gamePk,
-        **error_body(
+        **failure_frame(
             ErrorCode.DATA_SOURCE_UNAVAILABLE,
             message,
             uuid.uuid4().hex[:12],
@@ -154,7 +153,7 @@ class Broadcaster:
 
             # Zero innings is an empty state, not a failure.
             self._publish(
-                gamePk, {"type": "end", "gamePk": gamePk, "innings": len(innings)}
+                gamePk, {"type": END_TYPE, "gamePk": gamePk, "innings": len(innings)}
             )
         finally:
             # Deregister, or the next subscriber sees a live entry, starts no

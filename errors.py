@@ -105,3 +105,20 @@ def error_body(
             "request_id": request_id,
         }
     }
+
+
+# the same envelope, as a message
+# `failure`, not `error` -- EventSource fires its own `error` on connection loss
+# and both would land on one listener.
+FAILURE_TYPE = "failure"
+
+
+def failure_frame(
+    code: ErrorCode | str,
+    message: str,
+    request_id: str,
+    details: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """An error as a message, for transports with no status code to carry one.
+    Same shape every time, so errors.ts classifies one thing."""
+    return {"type": FAILURE_TYPE, **error_body(code, message, request_id, details)}

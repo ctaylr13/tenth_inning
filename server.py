@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import os
+import uuid
 from collections import Counter
 from enum import Enum
 from pathlib import Path
@@ -9,21 +10,27 @@ from typing import Annotated, Any
 
 import duckdb
 import pandas as pd
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi import Path as FastPath
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from error_handlers import get_request_id, install_error_handling
+from error_handlers import (
+    WS_INTERNAL_ERROR,
+    WS_NORMAL_CLOSURE,
+    get_request_id,
+    install_error_handling,
+)
 from errors import (
+    FAILURE_TYPE,
     DataSourceUnavailable,
     DuplicateWatchEntry,
     InternalError,
     ResourceNotFound,
     ValidationFailed,
 )
-from live import TERMINAL_TYPES, Broadcaster
+from live import END_TYPE, TERMINAL_TYPES, Broadcaster
 
 logging.basicConfig(
     level=logging.INFO,
@@ -286,6 +293,93 @@ async def stream_game(
             "X-Accel-Buffering": "no",
         },
     )
+
+
+# the same feed over websockets -- same ticker, same errors, no status line
+# The handlers reach a websocket scope too (Starlette passes a WebSocket where a
+# Request would be), so `raise` still works here -- _deliver just puts the
+# envelope in a frame instead of a response. What does NOT reach it is
+# RequestIDMiddleware, which is a BaseHTTPMiddleware and only wraps "http".
+
+# Keyed off the constants, not the literals -- rename one and this must follow.
+WS_CLOSE_CODES = {END_TYPE: WS_NORMAL_CLOSURE, FAILURE_TYPE: WS_INTERNAL_ERROR}
+
+
+async def _ws_send(websocket: WebSocket, message: dict[str, Any]) -> None:
+    """One frame. Same `default=str` as _sse -- the transports must not disagree
+    about how a stray date serializes."""
+    await websocket.send_text(json.dumps(message, default=str))
+
+
+async def _ws_wait_for_disconnect(websocket: WebSocket) -> None:
+    """Notice the client leaving. SSE gets this free when the ASGI server
+    cancels its generator; a send-only socket loop is parked on queue.get() and
+    nothing wakes it, so an abandoned ticker would run on."""
+    try:
+        while True:
+            if (await websocket.receive())["type"] == "websocket.disconnect":
+                return
+    except (WebSocketDisconnect, RuntimeError):
+        # RuntimeError: receive() after the disconnect was already consumed.
+        return
+
+
+@app.websocket("/api/live/ws/{gamePk}")
+async def stream_game_ws(
+    websocket: WebSocket, gamePk: Annotated[int, FastPath(gt=0)]
+) -> None:
+    """Replay one game's innings over a websocket.
+
+    Accept before reading, not after. A rejected handshake reaches JavaScript as
+    a bare close with no status and no body, so the client could not tell "no
+    such game" from "the API is down". Accepting costs the status line -- every
+    failure now looks like a 101 on the wire -- and buys back the envelope."""
+    # No middleware ran, so mint the id here and park it where _close_with_error
+    # will find it: one connection, one id, whether it ends well or badly.
+    request_id = uuid.uuid4().hex[:12]
+    websocket.state.request_id = request_id
+    await websocket.accept()
+
+    # Raised, not hand-delivered -- identical to the SSE route above, because
+    # the handler now knows how to answer a websocket. Anything else this read
+    # can raise (missing file, IO error, missing table) takes the same path.
+    exists = await asyncio.to_thread(
+        _read, f"SELECT 1 FROM {SCHEDULE_TABLE} WHERE gamePk = ? LIMIT 1", [gamePk]
+    )
+    if not exists:
+        raise ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
+
+    queue = broadcaster.subscribe(gamePk)
+    # Before the first send, so a client that vanishes mid-handshake is noticed.
+    reader = asyncio.create_task(_ws_wait_for_disconnect(websocket))
+
+    try:
+        await _ws_send(
+            websocket, {"type": "open", "gamePk": gamePk, "request_id": request_id}
+        )
+
+        while True:
+            pending = asyncio.ensure_future(queue.get())
+            done, _ = await asyncio.wait(
+                {pending, reader}, return_when=asyncio.FIRST_COMPLETED
+            )
+            if reader in done:
+                pending.cancel()
+                return
+
+            message = pending.result()
+            await _ws_send(websocket, message)
+            if message["type"] in TERMINAL_TYPES:
+                # Explicit, or Starlette picks the code instead.
+                await websocket.close(code=WS_CLOSE_CODES[message["type"]])
+                return
+    except WebSocketDisconnect:
+        # The client left between the wait and the send.
+        return
+    finally:
+        reader.cancel()
+        # Same guarantee as the SSE generator's finally.
+        broadcaster.unsubscribe(gamePk, queue)
 
 
 @app.get("/api/schedule")

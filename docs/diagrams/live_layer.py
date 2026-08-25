@@ -11,8 +11,7 @@ Needs graphviz on PATH (`brew install graphviz`).
 
 from pathlib import Path
 
-from diagrams import Cluster, Diagram, Edge
-from diagrams.generic.blank import Blank
+from diagrams import Cluster, Diagram, Edge, Node
 from diagrams.generic.storage import Storage
 from diagrams.onprem.client import Client
 from diagrams.onprem.compute import Server
@@ -30,6 +29,32 @@ COST = "firebrick"
 KEEPS = "darkgreen"
 LOSES = "darkorange"
 
+
+# Blank() is the obvious node for a text-only note and does not work: it has an
+# icon, so diagrams gives it shape="none" and a transparent 1.9in image, and the
+# edge lands on the top of that invisible box with the words drawn near its
+# bottom -- an arrow pointing at nothing. A bare Node has _icon = None.
+def Note(text: str) -> Node:
+    """A visible text box, sized to its own text. Every attribute here overrides
+    one of Diagram._default_node_attrs, which pins nodes to a fixed 1.4in square
+    and anchors labels to the bottom edge -- right for an icon with a caption,
+    wrong for a box that is only caption."""
+    return Node(
+        label=text,
+        shape="box",
+        style="rounded,filled",
+        fillcolor="white",
+        color="gray55",
+        fontsize="11",
+        margin="0.22,0.16",
+        fixedsize="false",
+        # Minimums once fixedsize is off, so the label decides.
+        width="0.1",
+        height="0.1",
+        labelloc="c",
+    )
+
+
 GRAPH_ATTR = {
     "fontsize": "20",
     "bgcolor": "white",
@@ -46,7 +71,7 @@ GRAPH_ATTR = {
 def transports() -> None:
     """The three paths side by side. Read each column top to bottom.
 
-    Long-form commentary lives in Blank note nodes rather than edge labels --
+    Long-form commentary lives in Note() boxes rather than edge labels --
     graphviz routes labelled edges around each other and the text ends up
     orbiting the picture instead of sitting next to what it describes.
     """
@@ -63,7 +88,7 @@ def transports() -> None:
             poll_ui = React("useSchedule.load()\nwrapped in setInterval")
             poll_api = FastAPI("GET /api/schedule\nfull request/response")
             poll_db = Storage("DuckDB\nredsox_25.duckdb")
-            poll_note = Blank(
+            poll_note = Note(
                 "CONTRACT: fully intact\n"
                 "every tick is a whole HTTP transaction,\n"
                 "so 200 / 404 / 503 + envelope all still work.\n"
@@ -94,11 +119,13 @@ def transports() -> None:
             sse_api = FastAPI("GET /api/live/{gamePk}\nStreamingResponse, held open")
             sse_tick = Server("replay ticker\n1 read per TICK, not per client")
             sse_db = Storage("DuckDB\nline_score_innings")
-            sse_note = Blank(
-                "CONTRACT: half intact\n"
-                "raise BEFORE the 1st byte -> real 503 + envelope\n"
-                "raise AFTER  the 1st byte -> RuntimeError,\n"
-                "status code already on the wire, 200 stands"
+            sse_note = Note(
+                "CONTRACT: half intact on the wire,\n"
+                "LESS than half in the browser\n"
+                "BEFORE the 1st byte -> real 404 + envelope,\n"
+                "  but EventSource discards a non-200 BODY:\n"
+                "  the hook only sees error + readyState CLOSED\n"
+                "AFTER  the 1st byte -> must be a `failure` event"
             )
 
             sse_ui >> Edge(label="  ONE request, never closed", color=KEEPS) >> sse_api
@@ -120,19 +147,27 @@ def transports() -> None:
             sse_db >> Edge(style="invis") >> sse_note
 
         # --- 3. the one built to feel the cost --------------------------------
-        with Cluster("3. Websocket  (two-way, HTTP gone after handshake)"):
-            ws_ui = React("new WebSocket()\nYOU write the reconnect")
-            ws_api = FastAPI("WS /ws/live/{gamePk}\nGET + Upgrade -> 101")
+        with Cluster("3. Websocket  (two-way, HTTP gone after the handshake)"):
+            ws_ui = React(
+                "new WebSocket()\nYOU write: absolute ws:// URL,\nreconnect, backoff, giving up"
+            )
+            ws_api = FastAPI("WS /api/live/ws/{gamePk}\nGET + Upgrade -> 101")
             ws_list = Server(
-                "connections: list[WebSocket]\nfor ws in connections:\n    await ws.send_json(...)"
+                "the SAME Broadcaster registry\ndict[int, set[Queue]]\nno second connection list"
             )
             ws_tick = Server("replay ticker\n1 read per TICK")
             ws_db = Storage("DuckDB\nline_score_innings")
-            ws_note = Blank(
-                "CONTRACT: must be rebuilt\n"
-                "BEFORE accept -> send_denial_response(404 + envelope)\n"
-                "AFTER  accept -> envelope rides INSIDE a frame\n"
-                "ON close      -> 2-byte code, no request_id possible"
+            ws_note = Note(
+                "CONTRACT: survives, and reaches the browser\n"
+                "  BETTER than SSE does\n"
+                "no middleware (BaseHTTPMiddleware is http-only),\n"
+                "  so the request_id is minted in the route\n"
+                "the HANDLERS do run -- Starlette hands them a\n"
+                "  WebSocket, so `raise` still works and _deliver\n"
+                "  puts the envelope in a frame, not a response\n"
+                "ACCEPT FIRST: a rejected handshake reaches JS\n"
+                "  as a bare 1006, with nothing readable on it\n"
+                "COST: every failure now looks like a 101 on the wire"
             )
 
             (
@@ -144,13 +179,16 @@ def transports() -> None:
             )
             (
                 ws_api
-                >> Edge(label="  append on accept\n  remove on disconnect")
+                >> Edge(label="  subscribe() on accept\n  unsubscribe() on disconnect")
                 >> ws_list
             )
             ws_tick >> Edge(label="  ONE query per tick", color=KEEPS) >> ws_db
             (
                 ws_tick
-                >> Edge(label="  THE FAN-OUT\n  IS A FOR-LOOP", color=COST)
+                >> Edge(
+                    label="  THE FAN-OUT IS A FOR-LOOP\n  (shared with SSE -- live.py\n  imports no transport)",
+                    color=KEEPS,
+                )
                 >> ws_list
             )
             ws_list >> Edge(label="  frames, BOTH directions", style="dashed") >> ws_ui
