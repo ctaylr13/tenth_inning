@@ -1,15 +1,10 @@
-"""The websocket live layer (Part 3b).
+"""The websocket live layer.
 
-test_live_sse.py guards a seam: before the first byte a failure is ordinary
-HTTP, after it the failure has to be an event. These tests guard what happens
-when that seam moves all the way to the front of the connection.
-
-A websocket has no status line the browser can read, ever -- not for a bad
-gamePk, not for a missing game, not for a database that fell over. So every
-assertion here is some version of the same question: did the envelope survive
-the trip, and can the client still tell the three apart?
-
-The ticker underneath is the same object the SSE route uses, unchanged.
+A websocket has no status line the browser can read -- not for a bad gamePk,
+not for a missing game, not for a database that fell over. So every assertion
+here is a version of one question: did the envelope survive the trip, and can
+the client still tell the three apart? The ticker underneath is the same object
+the SSE route uses, unchanged.
 """
 
 import json
@@ -19,6 +14,7 @@ from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 from test_live_sse import read_events
 
+import error_handlers
 import server
 
 client = TestClient(server.app)
@@ -38,12 +34,9 @@ MAX_FRAMES = 20
 
 
 def drain(websocket) -> tuple[list[dict], int | None]:
-    """Read one socket to completion. Returns (frames, close code).
-
-    The close code is read too because on this transport it is the only thing
-    an intermediary -- a proxy, a load balancer, a metrics agent -- ever sees.
-    A test that only checked the frames would pass while the wire lied.
-    """
+    """Read one socket to completion. The close code is returned too because it
+    is all an intermediary ever sees -- checking only frames would pass while
+    the wire lied."""
     frames: list[dict] = []
     while len(frames) <= MAX_FRAMES:
         message = websocket.receive()
@@ -70,11 +63,9 @@ def test_replays_every_inning_in_order_then_closes_clean():
 
 
 def test_the_request_id_is_minted_in_the_route_not_by_the_middleware():
-    """RequestIDMiddleware is a BaseHTTPMiddleware and only wraps scopes of type
-    "http", so nothing upstream produced an id here. It still has to exist, and
-    it has to travel in a frame -- the handshake's response headers are not
-    exposed to the browser's WebSocket API, so X-Request-ID would be unreadable
-    even if we set it."""
+    """RequestIDMiddleware only wraps "http" scopes, so nothing upstream made an
+    id. It travels in a frame because the handshake's response headers are not
+    exposed to the browser at all."""
     frames, _ = read_frames(777)
 
     assert frames[0]["type"] == "open"
@@ -93,11 +84,9 @@ def test_game_with_no_innings_ends_immediately_and_is_not_an_error():
 
 # --- the degradation: failures that used to be status codes -------------------
 def test_unknown_game_is_a_frame_now_not_a_404():
-    """The headline cost. The SSE route raises ResourceNotFound before the first
-    byte and gets a real 404 with the envelope in the body. Here the status line
-    was spent on the handshake, so the identical error has to be hand-delivered
-    as a message and the close code is a clean 1000 -- a socket that opened,
-    said one thing and hung up looks exactly like a success on the wire."""
+    """The headline cost. The status line was spent on the handshake, so the
+    identical error is hand-delivered as a message and the close code is a clean
+    1000 -- indistinguishable from success on the wire."""
     frames, close_code = read_frames(999999)
 
     assert [f["type"] for f in frames] == ["failure"]
@@ -116,12 +105,9 @@ def test_unknown_game_is_a_frame_now_not_a_404():
 
 
 def test_unparseable_gamePk_is_reshaped_not_raw_pydantic():
-    """FastAPI's own websocket validation handler closes the handshake with 1008
-    and pydantic's raw error list as the reason -- internals, on a channel the
-    browser cannot read (a handshake-phase close reaches JavaScript as a bare
-    1006). handle_websocket_validation_error is the fifth handler that exists to
-    stop that: accept, send the same reshaped fields the HTTP path sends, close.
-    """
+    """FastAPI's default leaks pydantic's raw error list as the close reason.
+    handle_websocket_validation_error sends the same reshaped fields the HTTP
+    path sends instead."""
     frames, close_code = read_frames("banana")
 
     assert [f["type"] for f in frames] == ["failure"]
@@ -136,7 +122,7 @@ def test_unparseable_gamePk_is_reshaped_not_raw_pydantic():
     ]
     assert error["request_id"]
     # 1008 is the entire 4xx range on this transport.
-    assert close_code == 1008
+    assert close_code == error_handlers.WS_POLICY_VIOLATION
 
 
 def test_zero_gamePk_fails_the_gt_constraint():
@@ -168,9 +154,8 @@ def test_loader_failure_arrives_as_a_frame_and_closes_1011():
 
 
 def test_route_not_found_is_still_a_handshake_rejection():
-    """Nothing matched the path, so there is no route to accept the socket and
-    no envelope to send. This one really is unrecoverable -- worth pinning so
-    the client's fallback for "closed with nothing" stays justified."""
+    """No route matched, so nothing can accept the socket. Pinned because it is
+    what the client's "closed with nothing" fallback exists for."""
     with (
         pytest.raises(WebSocketDisconnect),
         client.websocket_connect("/api/live/ws/777/nope"),
@@ -185,10 +170,8 @@ def test_subscribers_are_released_when_the_stream_finishes():
 
 
 def test_a_client_that_hangs_up_early_stops_the_ticker():
-    """What _ws_wait_for_disconnect is for. SSE gets this free: the ASGI server
-    cancels the response generator and its `finally` runs. A send-only websocket
-    loop is parked on queue.get() and nothing wakes it, so the ticker would keep
-    replaying to nobody."""
+    """What _ws_wait_for_disconnect is for -- a send-only loop parked on
+    queue.get() would otherwise keep replaying to nobody."""
     with client.websocket_connect("/api/live/ws/777") as websocket:
         websocket.receive()  # open
         assert server.broadcaster.subscriber_count(777) == 1
@@ -196,12 +179,10 @@ def test_a_client_that_hangs_up_early_stops_the_ticker():
     assert server.broadcaster.subscriber_count(777) == 0
 
 
-# One ticker serving two clients is asserted in test_broadcaster.py, not here.
-# Each TestClient websocket session runs the app in its OWN event loop, so a
-# second connection's queue belongs to a different loop than the ticker doing
-# the put_nowait -- the waiter never wakes and the test hangs. A real uvicorn
-# process has one loop and one registry, which is the whole premise of the
-# fan-out. Driving the Broadcaster directly is what keeps the claim testable.
+# One ticker serving two clients is asserted in test_broadcaster.py: each
+# TestClient websocket session runs the app in its own event loop, so the
+# ticker's put_nowait lands on a queue whose loop never wakes and the test
+# hangs. Real uvicorn has one loop.
 
 
 # --- parity with SSE ----------------------------------------------------------

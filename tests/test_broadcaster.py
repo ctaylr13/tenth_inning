@@ -118,15 +118,9 @@ def test_last_subscriber_out_cancels_the_ticker():
 
 
 def test_two_subscribers_on_one_game_cost_one_read():
-    """The fan-out claim itself. Polling costs one database read per client per
-    tick; the ticker costs one read no matter how many are watching, which is
-    the entire argument for a live transport over polling.
-
-    Driven directly rather than through two HTTP clients on purpose: each
-    TestClient session runs the app in its own event loop, and a queue created
-    in one loop cannot be woken by a put_nowait from another. One loop here is
-    what a real uvicorn process has anyway.
-    """
+    """The fan-out claim itself -- one read no matter how many are watching.
+    Driven directly rather than through two TestClients, which would each run
+    the app in their own event loop and never wake each other's queues."""
     calls = []
 
     def counted(gamePk: int) -> list[dict]:
