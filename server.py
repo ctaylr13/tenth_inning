@@ -16,16 +16,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from error_handlers import get_request_id, install_error_handling, log_error
+from error_handlers import (
+    WS_INTERNAL_ERROR,
+    WS_NORMAL_CLOSURE,
+    get_request_id,
+    install_error_handling,
+)
 from errors import (
+    FAILURE_TYPE,
     DataSourceUnavailable,
     DuplicateWatchEntry,
     InternalError,
     ResourceNotFound,
     ValidationFailed,
-    failure_frame,
 )
-from live import TERMINAL_TYPES, Broadcaster
+from live import END_TYPE, TERMINAL_TYPES, Broadcaster
 
 logging.basicConfig(
     level=logging.INFO,
@@ -290,15 +295,14 @@ async def stream_game(
     )
 
 
-# the same feed over websockets -- same ticker, none of the error handling
-# Neither half of error_handlers.py reaches a websocket scope: the middleware is
-# a BaseHTTPMiddleware, and every handler returns a JSONResponse.
-WS_NORMAL_CLOSURE = 1000
-WS_INTERNAL_ERROR = 1011
+# the same feed over websockets -- same ticker, same errors, no status line
+# The handlers reach a websocket scope too (Starlette passes a WebSocket where a
+# Request would be), so `raise` still works here -- _deliver just puts the
+# envelope in a frame instead of a response. What does NOT reach it is
+# RequestIDMiddleware, which is a BaseHTTPMiddleware and only wraps "http".
 
-# RFC 6455 has no code for "that row does not exist" -- 1011 is the closest
-# thing to a 5xx, and the frame carries what the code cannot.
-WS_CLOSE_CODES = {"end": WS_NORMAL_CLOSURE, "failure": WS_INTERNAL_ERROR}
+# Keyed off the constants, not the literals -- rename one and this must follow.
+WS_CLOSE_CODES = {END_TYPE: WS_NORMAL_CLOSURE, FAILURE_TYPE: WS_INTERNAL_ERROR}
 
 
 async def _ws_send(websocket: WebSocket, message: dict[str, Any]) -> None:
@@ -326,32 +330,24 @@ async def stream_game_ws(
 ) -> None:
     """Replay one game's innings over a websocket.
 
-    Accept first, then report. A rejected handshake reaches JavaScript as a bare
-    close with no status and no body, so the client could not tell "no such
-    game" from "the API is down". Accepting costs the status line -- every
+    Accept before reading, not after. A rejected handshake reaches JavaScript as
+    a bare close with no status and no body, so the client could not tell "no
+    such game" from "the API is down". Accepting costs the status line -- every
     failure now looks like a 101 on the wire -- and buys back the envelope."""
-    # No middleware ran, so there is no id on request.state to read.
+    # No middleware ran, so mint the id here and park it where _close_with_error
+    # will find it: one connection, one id, whether it ends well or badly.
     request_id = uuid.uuid4().hex[:12]
+    websocket.state.request_id = request_id
     await websocket.accept()
 
+    # Raised, not hand-delivered -- identical to the SSE route above, because
+    # the handler now knows how to answer a websocket. Anything else this read
+    # can raise (missing file, IO error, missing table) takes the same path.
     exists = await asyncio.to_thread(
         _read, f"SELECT 1 FROM {SCHEDULE_TABLE} WHERE gamePk = ? LIMIT 1", [gamePk]
     )
     if not exists:
-        # Built, not raised -- no handler runs here. Reusing the class is what
-        # keeps the message and details identical to the HTTP 404.
-        error = ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
-        log_error("WS", websocket.url.path, error, request_id)
-        await _ws_send(
-            websocket,
-            {
-                "gamePk": gamePk,
-                **failure_frame(error.code, error.message, request_id, error.details),
-            },
-        )
-        # Not WS_INTERNAL_ERROR -- the client was fine.
-        await websocket.close(code=WS_NORMAL_CLOSURE)
-        return
+        raise ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
 
     queue = broadcaster.subscribe(gamePk)
     # Before the first send, so a client that vanishes mid-handshake is noticed.

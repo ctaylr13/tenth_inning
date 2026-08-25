@@ -1,10 +1,14 @@
 """Request-ID middleware plus the five exception handlers.
 
 All five are required -- drop one and a class of failure escapes the envelope.
-Each handler only turns its exception into an AppError; `_respond` owns the
-envelope and header, `log_error` owns the log line, so one place can drift, not
-five. Four answer HTTP; the fifth answers a websocket, where there is no
-response to return and no middleware has run.
+Each handler only turns its exception into an AppError and hands it to
+`_deliver`, so one place can drift, not five.
+
+`_deliver` is where the transports part. An HTTP connection gets a response with
+a status code; a websocket gets the same envelope inside a frame, because past
+the handshake there is no response left to return. Handlers are reached on both
+-- Starlette passes a WebSocket where a Request would be -- so nothing here may
+assume `.method` exists.
 """
 
 from __future__ import annotations
@@ -18,6 +22,7 @@ from fastapi.exceptions import RequestValidationError, WebSocketRequestValidatio
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.websockets import WebSocketState
 
 from errors import (
     AppError,
@@ -98,9 +103,74 @@ def _respond(
     )
 
 
+# RFC 6455 close codes -- a separate, far coarser namespace than HTTP status.
+# 1008 is the whole 4xx range and 1011 the whole 5xx, so the code is only ever a
+# hint and the frame carries the truth.
+WS_NORMAL_CLOSURE = 1000
+WS_POLICY_VIOLATION = 1008
+WS_INTERNAL_ERROR = 1011
+
+
+def ws_close_code(error: AppError) -> int:
+    """The nearest close code to a status. Derived, not mapped by hand, so a new
+    AppError subclass cannot land on a code nobody chose."""
+    if error.status_code >= 500:
+        return WS_INTERNAL_ERROR
+    if error.status_code == ValidationFailed.status_code:
+        return WS_POLICY_VIOLATION
+    # No code means "that row does not exist", so say clean and let the frame
+    # do the talking.
+    return WS_NORMAL_CLOSURE
+
+
+async def _close_with_error(
+    websocket: WebSocket,
+    error: AppError,
+    *,
+    exc_info: BaseException | None = None,
+) -> None:
+    """The websocket half of `_respond`: same log line, same envelope, no status
+    line to put it on."""
+    # Reuse the id the route already handed out, so one connection has one id.
+    # A failure before the route ran has nothing to reuse.
+    request_id = getattr(websocket.state, "request_id", None) or uuid.uuid4().hex[:12]
+    log_error("WS", websocket.url.path, error, request_id, exc_info=exc_info)
+
+    # Nothing left to send to, and send() on a dead socket raises -- which would
+    # replace this error with an unrelated one.
+    if websocket.client_state is WebSocketState.DISCONNECTED:
+        return
+
+    # A socket that was never accepted cannot carry a frame at all. Accepting
+    # costs the rejection its status line and buys back the envelope.
+    if websocket.client_state is WebSocketState.CONNECTING:
+        await websocket.accept()
+
+    await websocket.send_text(
+        json.dumps(failure_frame(error.code, error.message, request_id, error.details))
+    )
+    await websocket.close(code=ws_close_code(error))
+
+
+async def _deliver(
+    conn: Request | WebSocket,
+    error: AppError,
+    *,
+    exc_info: BaseException | None = None,
+) -> JSONResponse | None:
+    """Every handler's only exit. Starlette hands websocket scopes a WebSocket
+    here, so the branch is required, not defensive."""
+    if isinstance(conn, WebSocket):
+        await _close_with_error(conn, error, exc_info=exc_info)
+        return None
+    return _respond(conn, error, exc_info=exc_info)
+
+
 # errors raised on purpose
-async def handle_app_error(request: Request, exc: AppError) -> JSONResponse:
-    return _respond(request, exc, exc_info=exc)
+async def handle_app_error(
+    conn: Request | WebSocket, exc: AppError
+) -> JSONResponse | None:
+    return await _deliver(conn, exc, exc_info=exc)
 
 
 # FastAPI starts every loc with where the value came from. The client knows
@@ -126,7 +196,7 @@ async def handle_validation_error(
         for err in exc.errors()
     ]
 
-    return _respond(request, ValidationFailed(fields=fields))
+    return await _deliver(request, ValidationFailed(fields=fields))
 
 
 # HTTPExceptions raised around the code (unmatched URL, 405)
@@ -139,8 +209,8 @@ _STATUS_TO_CODE = {
 
 
 async def handle_http_exception(
-    request: Request, exc: StarletteHTTPException
-) -> JSONResponse:
+    conn: Request | WebSocket, exc: StarletteHTTPException
+) -> JSONResponse | None:
     if exc.status_code >= 500:
         code = ErrorCode.INTERNAL_ERROR
     else:
@@ -149,55 +219,38 @@ async def handle_http_exception(
     message = exc.detail if isinstance(exc.detail, str) else "Request failed."
 
     # No subclass fits -- Starlette picked the status
-    return _respond(request, AppError(message, status_code=exc.status_code, code=code))
+    return await _deliver(
+        conn, AppError(message, status_code=exc.status_code, code=code)
+    )
 
 
 # the safety net for our own bugs
-async def handle_unexpected(request: Request, exc: Exception) -> JSONResponse:
+async def handle_unexpected(
+    conn: Request | WebSocket, exc: Exception
+) -> JSONResponse | None:
     """The request was fine, we broke, so 500.
     Exception text leaks table names, paths and query structure -- the client
     gets a request id, the traceback goes to the logs.
     """
-    return _respond(request, InternalError(), exc_info=exc)
+    return await _deliver(conn, InternalError(), exc_info=exc)
 
 
-# the same rejection, on a transport with no response to reject with
-# RFC 6455 close codes. A separate namespace from HTTP status codes and much
-# coarser -- 1008 is the whole 4xx range.
-WS_POLICY_VIOLATION = 1008
-
-
+# the rejection FastAPI would otherwise botch
 async def handle_websocket_validation_error(
     websocket: WebSocket, exc: WebSocketRequestValidationError
 ) -> None:
-    """The fifth handler, and the one the websocket transport forced.
-
-    FastAPI's default rejects the handshake with 1008 and pydantic's raw error
-    list as the close reason -- internals `handle_validation_error` exists to
-    reshape, on a channel the browser cannot read anyway (a handshake-phase
-    close reaches JavaScript as a bare 1006 with no reason at all).
-
-    So: accept, then report. That costs the rejection its status line -- every
-    bad request now looks like a successful 101 to proxies and metrics -- and
-    buys back the envelope, which is the only thing that lets the client tell
-    "you sent a bad gamePk" from "the API is down". Same trade stream_game_ws
-    makes for a missing game, made in the same direction on purpose.
-    """
-    # No middleware runs on a websocket scope, so there is no id to read back.
-    request_id = uuid.uuid4().hex[:12]
-    error = ValidationFailed(
-        fields=[
-            {"field": _field_path(err.get("loc", [])), "reason": err.get("msg", "")}
-            for err in exc.errors()
-        ]
+    """Replaces FastAPI's default, which rejects the handshake with pydantic's
+    raw error list as the close reason -- internals, on a channel the browser
+    cannot read (a rejected handshake reaches JS as a bare 1006)."""
+    await _close_with_error(
+        websocket,
+        ValidationFailed(
+            fields=[
+                {"field": _field_path(err.get("loc", [])), "reason": err.get("msg", "")}
+                for err in exc.errors()
+            ]
+        ),
     )
-    log_error("WS", websocket.url.path, error, request_id)
-
-    await websocket.accept()
-    await websocket.send_text(
-        json.dumps(failure_frame(error.code, error.message, request_id, error.details))
-    )
-    await websocket.close(code=WS_POLICY_VIOLATION)
 
 
 def install_error_handling(app: FastAPI) -> None:

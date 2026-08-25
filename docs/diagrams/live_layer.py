@@ -158,12 +158,15 @@ def transports() -> None:
             ws_tick = Server("replay ticker\n1 read per TICK")
             ws_db = Storage("DuckDB\nline_score_innings")
             ws_note = Note(
-                "CONTRACT: rebuilt by hand, and BETTER\n"
-                "  than SSE at reaching the browser\n"
-                "no middleware, no handler: both are HTTP-only,\n"
+                "CONTRACT: survives, and reaches the browser\n"
+                "  BETTER than SSE does\n"
+                "no middleware (BaseHTTPMiddleware is http-only),\n"
                 "  so the request_id is minted in the route\n"
-                "ACCEPT FIRST, then send the envelope as a frame --\n"
-                "  a rejected handshake reaches JS as a bare 1006\n"
+                "the HANDLERS do run -- Starlette hands them a\n"
+                "  WebSocket, so `raise` still works and _deliver\n"
+                "  puts the envelope in a frame, not a response\n"
+                "ACCEPT FIRST: a rejected handshake reaches JS\n"
+                "  as a bare 1006, with nothing readable on it\n"
                 "COST: every failure now looks like a 101 on the wire"
             )
 

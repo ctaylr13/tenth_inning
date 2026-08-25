@@ -57,7 +57,7 @@ Three files own it end to end:
 | File | Role |
 | --- | --- |
 | [`errors.py`](errors.py) | Typed `AppError` subclasses, the `ErrorCode` enum, `error_body()` — the single place that knows the envelope's shape — and `failure_frame()`, the same envelope as a message for transports with no status line |
-| [`error_handlers.py`](error_handlers.py) | Request-ID middleware plus five exception handlers. All five are required; drop one and a class of failure escapes the envelope. Four answer HTTP; the fifth answers a websocket, where there is no response to return |
+| [`error_handlers.py`](error_handlers.py) | Request-ID middleware plus five exception handlers, all required — drop one and a class of failure escapes the envelope. Each only builds an `AppError`; `_deliver` picks the transport, returning a response over HTTP and sending a frame over a websocket |
 | [`frontend/src/api/errors.ts`](frontend/src/api/errors.ts) | The client half — switches on `error.code`, never on the message or the status number |
 
 The rule the whole thing exists to enforce: **4xx if the client sent something wrong,
@@ -129,11 +129,18 @@ load balancers and metrics. The status code survives only in the server log:
 WS /api/live/ws/999999 -> 404 RESOURCE_NOT_FOUND [request_id=45bbdcc2eb5d] No game with gamePk 999999.
 ```
 
-Adding the transport also forced a **fifth** exception handler. FastAPI's default
-websocket validation handler rejects the handshake with close code `1008` and
-pydantic's raw error list as the reason — internals that `handle_validation_error`
-exists to reshape, on a channel the browser cannot read anyway (a handshake-phase
-close reaches JavaScript as a bare `1006`).
+Adding the transport also forced a **fifth** exception handler, and rewired the
+other four. FastAPI's default websocket validation handler rejects the handshake
+with close code `1008` and pydantic's raw error list as the reason — internals that
+`handle_validation_error` exists to reshape, on a channel the browser cannot read
+anyway (a handshake-phase close reaches JavaScript as a bare `1006`).
+
+The rewiring was the part that wasn't obvious. Starlette passes a `WebSocket` where
+a `Request` would go, so the existing handlers *are* reached on a websocket — they
+just used to die on `request.method`. Now `_deliver` branches on the connection
+type, which means `raise ResourceNotFound(...)` works identically in both live
+routes, and a failure the route never anticipated (a missing DuckDB file, an IO
+error) arrives as an envelope instead of a dropped socket.
 
 **Conclusion: SSE is still the right answer for a read-only score feed** — reconnect,
 backoff and heartbeats are free there and are hand-written code in

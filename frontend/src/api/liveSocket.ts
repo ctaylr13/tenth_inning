@@ -103,6 +103,10 @@ export const useSocketGame = (gamePk: number | null): SocketGame => {
                         // The server's count is the authority. Zero is an empty
                         // state, not an error.
                         finished = true;
+                        // Ours to close, same as es.close() in the SSE hook --
+                        // waiting on the server's close frame leaves the
+                        // connection open if it never arrives.
+                        socket?.close();
                         setState((prev) => ({
                             ...prev,
                             innings: frame.innings === 0 ? [] : prev.innings,
@@ -114,6 +118,7 @@ export const useSocketGame = (gamePk: number | null): SocketGame => {
                         // Final, not retryable -- and `error.code` is the only
                         // reason we can tell which. The close code cannot.
                         finished = true;
+                        socket?.close();
                         setState((prev) => ({
                             ...prev,
                             failure: classify(frame.error),

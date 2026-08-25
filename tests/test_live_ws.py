@@ -125,6 +125,49 @@ def test_unparseable_gamePk_is_reshaped_not_raw_pydantic():
     assert close_code == error_handlers.WS_POLICY_VIOLATION
 
 
+def test_a_broken_database_arrives_as_a_frame_not_a_dropped_socket():
+    """The read happens after accept(), so an AppError raised there has no status
+    line left to travel on. It reaches the handlers anyway -- Starlette passes a
+    WebSocket where a Request would be -- and _deliver puts it in a frame.
+
+    Regression: this used to raise out of the route, and the handler then died on
+    `request.method`, so the client got a dropped socket and the log got an
+    AttributeError instead of the real cause."""
+    monkeypatched = pytest.MonkeyPatch()
+    monkeypatched.setattr(server, "DB_PATH", "/nonexistent/redsox_25.duckdb")
+    try:
+        frames, close_code = read_frames(777)
+    finally:
+        monkeypatched.undo()
+
+    assert [f["type"] for f in frames] == ["failure"]
+    error = frames[0]["error"]
+    assert error["code"] == "INTERNAL_ERROR"
+    assert error["request_id"]
+    assert close_code == error_handlers.WS_INTERNAL_ERROR
+
+
+def test_a_ticker_failure_carries_its_own_id_not_the_connections():
+    """Two id sources, on purpose. _close_with_error reuses what the route parked
+    on websocket.state, so one connection has one id. The ticker cannot: it fans
+    one failure out to every subscriber, and no single connection owns it."""
+    original = server.broadcaster._load
+
+    def boom(gamePk):
+        raise RuntimeError("duckdb exploded")
+
+    server.broadcaster._load = boom
+    try:
+        frames, _ = read_frames(778)
+    finally:
+        server.broadcaster._load = original
+
+    opened, failed = frames
+    assert opened["type"] == "open"
+    assert failed["type"] == "failure"
+    assert failed["error"]["request_id"] != opened["request_id"]
+
+
 def test_zero_gamePk_fails_the_gt_constraint():
     frames, _ = read_frames(0)
 
