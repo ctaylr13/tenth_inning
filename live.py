@@ -30,14 +30,13 @@ QUEUE_MAX = 32
 
 DEFAULT_INTERVAL_SECONDS = 1.0
 
-# `failure` comes from errors.py so the frame vocabulary has one owner.
+# `failure` from errors.py, so the frame vocabulary has one owner.
 END_TYPE = "end"
 TERMINAL_TYPES = (END_TYPE, FAILURE_TYPE)
 
 
 def _failure(gamePk: int, message: str) -> dict[str, Any]:
-    """The ticker's one failure mode, as a terminal frame. `gamePk` alongside
-    the envelope so a client watching two games can tell them apart."""
+    """The ticker's one failure mode, as a terminal frame."""
     return {
         "gamePk": gamePk,
         **failure_frame(
