@@ -1,7 +1,7 @@
 # tenth_inning
 
 A Red Sox 2025 season explorer: a DuckDB warehouse built from MLB StatsAPI data, a
-FastAPI read layer over it, and a React frontend that renders the schedule and a
+FastAPI read layer over it, and a React frontend that renders the schedule
 
 ---
 
