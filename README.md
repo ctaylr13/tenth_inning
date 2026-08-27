@@ -56,6 +56,13 @@ Application code decodes with the generated `game_artifact_pb2` module. The smal
 manual wire scanner lives only in `tests/learning/test_protobuf_wire_format.py` and
 exists to make tags, varints, lengths, and byte offsets visible once.
 
+Game artifacts are delivered directly from a private GCS bucket. Set `GCS_BUCKET`
+and configure Application Default Credentials with object-read and URL-signing
+permissions. Store only the object name (for example,
+`games/777940/v1/game.pb`) in `artifact.gcs_key`; `GET /api/games/{gamePk}` adds
+a 15-minute V4 `artifact_url` for the newest delivered schema version. Until a
+game has a delivered artifact, that field is `null`.
+
 ---
 
 ## Local Postgres

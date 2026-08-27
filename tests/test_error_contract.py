@@ -8,6 +8,8 @@ No server and no port required -- TestClient talks to the ASGI app in-process,
 which also sidesteps the Docker-on-8000 collision entirely.
 """
 
+from unittest.mock import Mock
+
 import duckdb
 import pytest
 from fastapi.testclient import TestClient
@@ -386,13 +388,29 @@ def test_field_paths_drop_the_location_prefix():
     assert envelope(b)["details"]["fields"][0]["field"] == "0.gamePk"
 
 
-def test_known_game_returns_detail():
+def test_known_game_returns_detail(monkeypatch):
+    monkeypatch.setattr(server, "_latest_game_artifact_key", lambda gamePk: None)
     r = client.get("/api/games/777")
     assert r.status_code == 200
     body = r.json()
     assert body["gamePk"] == 777
     assert body["away_team_name"] == "Texas Rangers"
     assert body["watched"] is True
+    assert body["artifact_url"] is None
+
+
+def test_known_game_includes_signed_artifact_url(monkeypatch):
+    monkeypatch.setattr(
+        server, "_latest_game_artifact_key", lambda gamePk: "games/777/v1/game.pb"
+    )
+    signer = Mock(return_value="https://storage.example/signed")
+    monkeypatch.setattr(server, "signed_download_url", signer)
+
+    r = client.get("/api/games/777")
+
+    assert r.status_code == 200
+    assert r.json()["artifact_url"] == "https://storage.example/signed"
+    signer.assert_called_once_with("games/777/v1/game.pb")
 
 
 def test_unknown_game_is_resource_not_found_not_route_not_found():

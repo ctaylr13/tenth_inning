@@ -19,6 +19,7 @@ from pydantic import BaseModel
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
+from artifact_delivery import signed_download_url
 from error_handlers import (
     WS_INTERNAL_ERROR,
     WS_NORMAL_CLOSURE,
@@ -93,6 +94,30 @@ def _watched_true_pks() -> set[int]:
                 text('SELECT "gamePk" FROM watch_history WHERE watched')
             )
             return {row[0] for row in rows}
+    except OperationalError as e:
+        raise DataSourceUnavailable() from e
+    except ProgrammingError as e:
+        raise InternalError("A required table is missing from the database.") from e
+
+
+def _latest_game_artifact_key(gamePk: int) -> str | None:
+    """Newest delivered artifact for a game; absent is valid during migration."""
+    try:
+        with pg_engine.connect() as conn:
+            return conn.execute(
+                text(
+                    """
+                    SELECT gcs_key
+                    FROM artifact
+                    WHERE kind = 'game'
+                      AND game_pk = :game_pk
+                      AND gcs_key IS NOT NULL
+                    ORDER BY schema_version DESC
+                    LIMIT 1
+                    """
+                ),
+                {"game_pk": gamePk},
+            ).scalar_one_or_none()
     except OperationalError as e:
         raise DataSourceUnavailable() from e
     except ProgrammingError as e:
@@ -227,6 +252,8 @@ def get_game(gamePk: Annotated[int, FastPath(gt=0)]) -> dict[str, Any]:
         raise ResourceNotFound(f"No game with gamePk {gamePk}.", gamePk=gamePk)
     row = rows[0]
     row["watched"] = gamePk in _watched_true_pks()
+    gcs_key = _latest_game_artifact_key(gamePk)
+    row["artifact_url"] = signed_download_url(gcs_key) if gcs_key else None
     return row
 
 
