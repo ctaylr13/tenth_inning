@@ -37,6 +37,25 @@ Tests:
 myenv/bin/pytest
 ```
 
+### Game artifacts
+
+`artifacts/game_artifact.proto` is the versioned game snapshot contract. Regenerate
+its checked-in Python decoder after changing the schema:
+
+```bash
+myenv/bin/python -m grpc_tools.protoc -I. --python_out=. artifacts/game_artifact.proto
+```
+
+Export one game from the legacy warehouse:
+
+```bash
+myenv/bin/python -m scripts.create_game_artifact 777940 --output game-777940.pb
+```
+
+Application code decodes with the generated `game_artifact_pb2` module. The small
+manual wire scanner lives only in `tests/learning/test_protobuf_wire_format.py` and
+exists to make tags, varints, lengths, and byte offsets visible once.
+
 ---
 
 ## Local Postgres
