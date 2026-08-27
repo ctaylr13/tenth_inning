@@ -14,6 +14,7 @@ import {
     GameArtifactSchema,
     type GameArtifact,
 } from "../generated/artifacts/game_artifact_pb";
+import { request, type Outcome } from "./errors";
 
 export const GAME_ARTIFACT_SCHEMA_VERSION = 1;
 
@@ -37,6 +38,10 @@ export type ArtifactConnection = Pick<
     "insertArrowTable"
 >;
 
+type GameArtifactLocation = {
+    artifact_url: string | null;
+};
+
 type Optional<T> = T | null | undefined;
 
 const nullable = <T,>(values: readonly Optional<T>[]): (T | null)[] =>
@@ -56,6 +61,11 @@ const booleanVector = (values: readonly Optional<boolean>[]) =>
 
 const stringVector = (values: readonly Optional<string>[]) =>
     vectorFromArray(nullable(values), new Utf8());
+
+export const getGameArtifactLocation = (
+    gamePk: number
+): Promise<Outcome<GameArtifactLocation>> =>
+    request<GameArtifactLocation>(`/api/games/${gamePk}`);
 
 export const fetchGameArtifact = async (
     signedUrl: string,

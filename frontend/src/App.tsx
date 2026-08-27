@@ -2,10 +2,14 @@ import Schedule from "./Schedule";
 import ScorecardPage from "./components/ScorecardPage";
 import NewSchedule from "./NewSchedule";
 import LiveGame from "./components/live/LiveGame";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
+
+const PitchTablePage = lazy(
+    () => import("./components/pitches/PitchTablePage")
+);
 
 const App = () => {
-    const [currentAppPage, setCurrentAppPage] = useState("live");
+    const [currentAppPage, setCurrentAppPage] = useState("pitches");
 
     const selectPageOnClick = (selectedPage: string) => {
         setCurrentAppPage(selectedPage);
@@ -24,11 +28,17 @@ const App = () => {
                     updated schedule
                 </button>
                 <button onClick={() => selectPageOnClick("live")}>live</button>
+                <button onClick={() => selectPageOnClick("pitches")}>pitches</button>
             </div>
             {currentAppPage === "schedule" && <Schedule />}
             {currentAppPage === "scorecard" && <ScorecardPage />}
             {currentAppPage === "newSchedule" && <NewSchedule />}
             {currentAppPage === "live" && <LiveGame />}
+            {currentAppPage === "pitches" && (
+                <Suspense fallback={null}>
+                    <PitchTablePage />
+                </Suspense>
+            )}
         </>
     );
 };
