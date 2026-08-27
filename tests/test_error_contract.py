@@ -163,6 +163,15 @@ def test_locked_database_is_503(monkeypatch):
     assert envelope(r)["code"] == ErrorCode.DATA_SOURCE_UNAVAILABLE.value
 
 
+def test_duckdb_is_opened_read_only():
+    conn = server.get_conn()
+    try:
+        with pytest.raises(duckdb.InvalidInputException):
+            conn.execute("CREATE TABLE should_never_exist (id INTEGER)")
+    finally:
+        conn.close()
+
+
 def test_missing_table_is_500_not_404(tmp_path, monkeypatch):
     """Our schema being broken is our fault. The client's URL was valid.
 

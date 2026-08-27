@@ -104,7 +104,7 @@ def get_conn():
     if not Path(DB_PATH).exists():
         raise InternalError(f"Database file {DB_PATH!r} is missing.")
     try:
-        return duckdb.connect(DB_PATH)
+        return duckdb.connect(DB_PATH, read_only=True)
     except duckdb.IOException as e:
         raise DataSourceUnavailable() from e
 
