@@ -1,10 +1,11 @@
 import { create, toBinary } from "@bufbuild/protobuf";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
     GAME_ARTIFACT_TABLE_NAMES,
     decodeGameArtifact,
     gameArtifactToArrow,
+    getGameArtifactLocation,
     loadGameArtifactIntoDuckDB,
     type ArtifactConnection,
 } from "./gameArtifact";
@@ -12,6 +13,8 @@ import {
     GameArtifactSchema,
     HalfInning,
 } from "../generated/artifacts/game_artifact_pb";
+
+afterEach(() => vi.unstubAllGlobals());
 
 const artifact = create(GameArtifactSchema, {
     schemaVersion: 1,
@@ -60,6 +63,22 @@ const arrayBuffer = (bytes: Uint8Array): ArrayBuffer =>
     ) as ArrayBuffer;
 
 describe("game artifact browser adapter", () => {
+    it("gets the signed artifact location through the API contract", async () => {
+        const fetcher = vi.fn(
+            async () =>
+                new Response(
+                    JSON.stringify({ artifact_url: "https://storage.example/signed" })
+                )
+        );
+        vi.stubGlobal("fetch", fetcher);
+
+        await expect(getGameArtifactLocation(777940)).resolves.toEqual({
+            status: "ok",
+            data: { artifact_url: "https://storage.example/signed" },
+        });
+        expect(fetcher).toHaveBeenCalledWith("/api/games/777940", undefined);
+    });
+
     it("decodes generated Protobuf and preserves optional scalar absence", () => {
         const decoded = decodeGameArtifact(
             arrayBuffer(toBinary(GameArtifactSchema, artifact))

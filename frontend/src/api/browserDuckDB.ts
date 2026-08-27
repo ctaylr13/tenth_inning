@@ -57,11 +57,8 @@ export const openGameArtifactDatabase = async (
             },
         };
     } catch (error) {
-        try {
-            await connection?.close();
-        } finally {
-            await database.terminate();
-        }
+        await connection?.close().catch(() => undefined);
+        await database.terminate().catch(() => undefined);
         throw error;
     }
 };

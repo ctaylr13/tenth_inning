@@ -22,7 +22,7 @@ const pitchTable = tableFromArrays({
 describe("pitch table SQL", () => {
     it("lists the pitch types present in the artifact", async () => {
         const query = vi.fn(async (sql: string) => {
-            void sql;
+            expect(sql).toContain("SELECT DISTINCT pitch_type_code");
             return tableFromArrays({
                 pitch_type_code: ["FF"],
                 pitch_type_description: ["Four-Seam Fastball"],
@@ -33,25 +33,21 @@ describe("pitch table SQL", () => {
         await expect(listPitchTypes(connection)).resolves.toEqual([
             { code: "FF", description: "Four-Seam Fastball" },
         ]);
-        expect(query.mock.calls[0]?.[0]).toContain(
-            "SELECT DISTINCT pitch_type_code"
-        );
+        expect(query).toHaveBeenCalledOnce();
     });
 
     it("binds the selected pitch type in the DuckDB query", async () => {
         const statementQuery = vi.fn(async () => pitchTable);
         const close = vi.fn(async () => undefined);
         const prepare = vi.fn(async (sql: string) => {
-            void sql;
+            expect(sql).toContain("WHERE p.pitch_type_code = ?");
             return { query: statementQuery, close };
         });
         const connection = { prepare } as unknown as AsyncDuckDBConnection;
 
         const rows = await queryPitches(connection, "FF");
 
-        expect(prepare.mock.calls[0]?.[0]).toContain(
-            "WHERE p.pitch_type_code = ?"
-        );
+        expect(prepare).toHaveBeenCalledOnce();
         expect(statementQuery).toHaveBeenCalledWith("FF");
         expect(close).toHaveBeenCalledOnce();
         expect(rows[0]).toMatchObject({

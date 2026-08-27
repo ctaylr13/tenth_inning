@@ -162,6 +162,12 @@ const PitchCode = styled.span`
     text-align: center;
 `;
 
+const PitchTableRow = styled.tr`
+    &:last-child td {
+        border-bottom: 0;
+    }
+`;
+
 const formatCount = (row: PitchRow): string =>
     row.balls === null || row.strikes === null
         ? "—"
@@ -169,6 +175,9 @@ const formatCount = (row: PitchRow): string =>
 
 const formatVelocity = (velocity: number | null): string =>
     velocity === null ? "—" : `${velocity.toFixed(1)} mph`;
+
+const formatResultCount = (count: number, querying: boolean): string =>
+    querying ? "Running SQL…" : `${count} pitch${count === 1 ? "" : "es"}`;
 
 const PitchTablePage = () => {
     const {
@@ -229,9 +238,7 @@ const PitchTablePage = () => {
             {!loading && !error && (
                 <>
                     <ResultCount aria-live="polite">
-                        {querying
-                            ? "Running SQL…"
-                            : `${rows.length} pitch${rows.length === 1 ? "" : "es"}`}
+                        {formatResultCount(rows.length, querying)}
                     </ResultCount>
                     <TableFrame>
                         <Table>
@@ -248,7 +255,9 @@ const PitchTablePage = () => {
                             </thead>
                             <tbody>
                                 {rows.map((row) => (
-                                    <tr key={`${row.paId}-${row.pitchNumber}`}>
+                                    <PitchTableRow
+                                        key={`${row.paId}-${row.pitchNumber}`}
+                                    >
                                         <Td>
                                             {row.halfInning} {row.inning}
                                         </Td>
@@ -266,7 +275,7 @@ const PitchTablePage = () => {
                                             {formatVelocity(row.startSpeed)}
                                         </Td>
                                         <Td>{row.description || "—"}</Td>
-                                    </tr>
+                                    </PitchTableRow>
                                 ))}
                             </tbody>
                         </Table>

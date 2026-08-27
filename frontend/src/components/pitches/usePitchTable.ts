@@ -11,7 +11,7 @@ import {
     openGameArtifactDatabase,
     type GameArtifactDatabase,
 } from "../../api/browserDuckDB";
-import { request } from "../../api/errors";
+import { getGameArtifactLocation } from "../../api/gameArtifact";
 import {
     listPitchTypes,
     queryPitches,
@@ -21,8 +21,9 @@ import {
 
 const DEFAULT_GAME_PK = 777940;
 
-type GameDetail = {
-    artifact_url: string | null;
+type GameSelection = {
+    gamePk: number;
+    revision: number;
 };
 
 type PitchTableState = {
@@ -46,14 +47,27 @@ const errorMessage = (error: unknown): string =>
         ? error.message
         : "The pitch table could not be loaded.";
 
-export const usePitchTable = () => {
-    const [gamePk, setGamePk] = useState(DEFAULT_GAME_PK);
-    const [gamePkInput, setGamePkInput] = useState(String(DEFAULT_GAME_PK));
-    const [loadRevision, setLoadRevision] = useState(0);
+const withError = (
+    state: PitchTableState,
+    error: string
+): PitchTableState => ({
+    ...state,
+    loading: false,
+    querying: false,
+    error,
+});
+
+export const usePitchTable = (defaultGamePk = DEFAULT_GAME_PK) => {
+    const [selection, setSelection] = useState<GameSelection>({
+        gamePk: defaultGamePk,
+        revision: 0,
+    });
+    const [gamePkInput, setGamePkInput] = useState(String(defaultGamePk));
     const [pitchType, setPitchType] = useState("");
     const [state, setState] = useState<PitchTableState>(emptyState);
     const databaseRef = useRef<GameArtifactDatabase | null>(null);
     const queryRevision = useRef(0);
+    const { gamePk, revision } = selection;
 
     useEffect(() => {
         let cancelled = false;
@@ -64,22 +78,21 @@ export const usePitchTable = () => {
         databaseRef.current = null;
 
         const load = async () => {
-            const response = await request<GameDetail>(`/api/games/${gamePk}`);
+            const response = await getGameArtifactLocation(gamePk);
             if (cancelled) return;
             if (response.status !== "ok") {
-                setState((current) => ({
-                    ...current,
-                    loading: false,
-                    error: response.error.message,
-                }));
+                setState((current) =>
+                    withError(current, response.error.message)
+                );
                 return;
             }
             if (!response.data.artifact_url) {
-                setState((current) => ({
-                    ...current,
-                    loading: false,
-                    error: `Game ${gamePk} does not have a delivered artifact yet.`,
-                }));
+                setState((current) =>
+                    withError(
+                        current,
+                        `Game ${gamePk} does not have a delivered artifact yet.`
+                    )
+                );
                 return;
             }
 
@@ -112,11 +125,9 @@ export const usePitchTable = () => {
                     openedDatabase = null;
                 }
                 if (!cancelled) {
-                    setState((current) => ({
-                        ...current,
-                        loading: false,
-                        error: errorMessage(error),
-                    }));
+                    setState((current) =>
+                        withError(current, errorMessage(error))
+                    );
                 }
             }
         };
@@ -127,9 +138,11 @@ export const usePitchTable = () => {
             cancelled = true;
             queryRevision.current += 1;
             databaseRef.current = null;
-            if (openedDatabase) void openedDatabase.close();
+            if (openedDatabase) {
+                void openedDatabase.close().catch(() => undefined);
+            }
         };
-    }, [gamePk, loadRevision]);
+    }, [gamePk, revision]);
 
     const handleGamePkChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
@@ -143,14 +156,15 @@ export const usePitchTable = () => {
             event.preventDefault();
             const nextGamePk = Number(gamePkInput);
             if (!Number.isSafeInteger(nextGamePk) || nextGamePk <= 0) {
-                setState((current) => ({
-                    ...current,
-                    error: "Enter a positive gamePk.",
-                }));
+                setState((current) =>
+                    withError(current, "Enter a positive gamePk.")
+                );
                 return;
             }
-            setGamePk(nextGamePk);
-            setLoadRevision((current) => current + 1);
+            setSelection((current) => ({
+                gamePk: nextGamePk,
+                revision: current.revision + 1,
+            }));
         },
         [gamePkInput]
     );
@@ -174,11 +188,9 @@ export const usePitchTable = () => {
                 }));
             } catch (error) {
                 if (revision !== queryRevision.current) return;
-                setState((current) => ({
-                    ...current,
-                    querying: false,
-                    error: errorMessage(error),
-                }));
+                setState((current) =>
+                    withError(current, errorMessage(error))
+                );
             }
         },
         []
