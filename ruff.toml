@@ -14,7 +14,7 @@ target-version = "py313"
 
 # sox_2025/ is ~68 one-off data-ingest scripts, not part of the API. Formatting
 # them all would bury every real diff. Opt them in deliberately, not by default.
-extend-exclude = ["sox_2025"]
+extend-exclude = ["sox_2025", "*_pb2.py"]
 
 [lint]
 select = [

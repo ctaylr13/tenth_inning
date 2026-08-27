@@ -10,6 +10,7 @@
 
 pytest==9.1.1
 httpx==0.28.1
+grpcio-tools==1.78.0
 
 # Lint and format. Config lives in ruff.toml.
 #
