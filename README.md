@@ -63,6 +63,19 @@ permissions. Store only the object name (for example,
 a 15-minute V4 `artifact_url` for the newest delivered schema version. Until a
 game has a delivered artifact, that field is `null`.
 
+Allow the local frontend to read signed object responses in the browser:
+
+```bash
+gcloud storage buckets update gs://YOUR_BUCKET --cors-file=config/gcs-cors.json
+```
+
+Add the deployed frontend origin to that file before applying it in production.
+
+The frontend's **pitches** page is the first visible browser proof: it downloads one
+delivered game, registers the decoded Arrow tables in DuckDB-WASM, and renders a
+pitch table with a parameterized pitch-type SQL filter. It intentionally stops at
+that slice; later additive Protobuf fields can grow toward the full scorecard.
+
 ---
 
 ## Local Postgres
